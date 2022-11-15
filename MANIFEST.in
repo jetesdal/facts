@@ -1,5 +1,4 @@
-include *.py *.json *.md *.sh
-include MANIFEST.in README.md
+include *.py *.json *.md *.sh *.yml
+include MANIFEST.in README.md CHANGES.md LICENSE.md VERSION
 
 recursive-include modules   *
-recursive-include other     *
