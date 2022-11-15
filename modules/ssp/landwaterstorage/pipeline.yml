@@ -8,7 +8,7 @@ preprocess:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: "tar -xzf ssp_landwaterstorage_preprocess_data.tgz; rm ssp_landwaterstorage_preprocess_data.tgz; pip install --upgrade pip; pip install numpy scipy netCDF4 pyyaml matplotlib"
+    python_dependencies: "numpy scipy netCDF4 pyyaml matplotlib"
     script: "ssp_preprocess_landwaterstorage.py"
     options:
       - "scenario"
@@ -20,8 +20,9 @@ preprocess:
       - "pyear_step"
       - "pipeline_id"
     upload_input_data:
-      - "./modules/ssp/landwaterstorage/ssp_preprocess_landwaterstorage.py"
-      - "./modules/ssp/landwaterstorage/data/ssp_landwaterstorage_preprocess_data.tgz"
+      - "%MODULE_PATH%/ssp_preprocess_landwaterstorage.py"
+    upload_and_extract_input_data:
+      - "%MODULE_PATH%/data/ssp_landwaterstorage_preprocess_data.tgz"
 #    download_output_data:
 #      - "%PIPELINE_ID%_data.pkl"
 #      - "%PIPELINE_ID%_config.pkl"
@@ -34,12 +35,11 @@ fit:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: []
     script: "ssp_fit_landwaterstorage.py"
     options:
       - "pipeline_id"
     upload_input_data:
-      - './modules/ssp/landwaterstorage/ssp_fit_landwaterstorage.py'
+      - '%MODULE_PATH%/ssp_fit_landwaterstorage.py'
     copy_input_data:
       preprocess:
         task1:
@@ -56,7 +56,6 @@ project:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: []
     script: "ssp_project_landwaterstorage.py"
     options:
       - "pipeline_id"
@@ -67,7 +66,7 @@ project:
       - "dcrate_hi"
       - "seed"
     upload_input_data:
-      - './modules/ssp/landwaterstorage/ssp_project_landwaterstorage.py'
+      - '%MODULE_PATH%/ssp_project_landwaterstorage.py'
     copy_input_data:
       preprocess:
         task1:
@@ -89,16 +88,16 @@ postprocess:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: "tar -xzf ssp_landwaterstorage_postprocess_data.tgz; rm ssp_landwaterstorage_postprocess_data.tgz"
     script: "ssp_postprocess_landwaterstorage.py"
     options:
       - "locationfile"
       - "pipeline_id"
     upload_input_data:
-      - './modules/ssp/landwaterstorage/ssp_postprocess_landwaterstorage.py'
-      - './modules/ssp/landwaterstorage/read_locationfile.py'
-      - './modules/ssp/landwaterstorage/AssignFP.py'
-      - './modules/ssp/landwaterstorage/data/ssp_landwaterstorage_postprocess_data.tgz'
+      - '%MODULE_PATH%/ssp_postprocess_landwaterstorage.py'
+      - '%MODULE_PATH%/read_locationfile.py'
+      - '%MODULE_PATH%/AssignFP.py'
+    upload_and_extract_input_data:
+      - '%MODULE_PATH%/data/ssp_landwaterstorage_postprocess_data.tgz'
     copy_shared_data:
       - '$SHARED/location.lst'
     copy_input_data:

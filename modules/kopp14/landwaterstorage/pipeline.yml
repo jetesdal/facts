@@ -8,7 +8,7 @@ preprocess:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: "tar -xzf kopp14_landwaterstorage_preprocess_data.tgz; rm kopp14_landwaterstorage_preprocess_data.tgz; pip install --upgrade pip; pip install numpy scipy netCDF4 pyyaml matplotlib"
+    python_dependencies: "numpy scipy netCDF4 pyyaml matplotlib"
     script: "kopp14_preprocess_landwaterstorage.py"
     options:
       - "dotriangular"
@@ -19,8 +19,9 @@ preprocess:
       - "pyear_step"
       - "pipeline_id"
     upload_input_data:
-      - "./modules/kopp14/landwaterstorage/kopp14_preprocess_landwaterstorage.py"
-      - "./modules/kopp14/landwaterstorage/data/kopp14_landwaterstorage_preprocess_data.tgz"
+      - "%MODULE_PATH%/kopp14_preprocess_landwaterstorage.py"
+    upload_and_extract_input_data:
+      - "%MODULE_PATH%/data/kopp14_landwaterstorage_preprocess_data.tgz"
 #    download_output_data:
 #      - "%PIPELINE_ID%_data.pkl"
 #      - "%PIPELINE_ID%_config.pkl"
@@ -33,12 +34,11 @@ fit:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: []
     script: "kopp14_fit_landwaterstorage.py"
     options:
       - "pipeline_id"
     upload_input_data:
-      - './modules/kopp14/landwaterstorage/kopp14_fit_landwaterstorage.py'
+      - '%MODULE_PATH%/kopp14_fit_landwaterstorage.py'
     copy_input_data:
       preprocess:
         task1:
@@ -55,14 +55,13 @@ project:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: []
     script: "kopp14_project_landwaterstorage.py"
     options:
       - "nsamps"
       - "seed"
       - "pipeline_id"
     upload_input_data:
-      - './modules/kopp14/landwaterstorage/kopp14_project_landwaterstorage.py'
+      - '%MODULE_PATH%/kopp14_project_landwaterstorage.py'
     copy_input_data:
       preprocess:
         task1:
@@ -85,15 +84,14 @@ postprocess:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: []
     script: "kopp14_postprocess_landwaterstorage.py"
     options:
       - "locationfile"
       - "pipeline_id"
     upload_input_data:
-      - './modules/kopp14/landwaterstorage/kopp14_postprocess_landwaterstorage.py'
-      - './modules/kopp14/landwaterstorage/read_locationfile.py'
-#      - './modules/kopp14/landwaterstorage/data/kopp14_landwaterstorage_postprocess_data.tgz'
+      - '%MODULE_PATH%/kopp14_postprocess_landwaterstorage.py'
+      - '%MODULE_PATH%/read_locationfile.py'
+#      - '%MODULE_PATH%/data/kopp14_landwaterstorage_postprocess_data.tgz'
     copy_shared_data:
       - '$SHARED/location.lst'
     copy_input_data:

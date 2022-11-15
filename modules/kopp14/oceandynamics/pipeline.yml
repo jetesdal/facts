@@ -8,7 +8,7 @@ preprocess:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: "tar -xzf kopp14_oceandynamics_data.tgz; rm kopp14_oceandynamics_data.tgz; pip install --upgrade pip; pip install numpy scipy netCDF4 pyyaml h5py"
+    python_dependencies: "numpy scipy netCDF4 pyyaml h5py"
     script: "kopp14_preprocess_oceandynamics.py"
     options:
       - "scenario"
@@ -19,16 +19,17 @@ preprocess:
       - "locationfile"
       - "pipeline_id"
     upload_input_data:
-      - "./modules/kopp14/oceandynamics/kopp14_preprocess_oceandynamics.py"
-      - "./modules/kopp14/oceandynamics/IncludeModels.py"
-      - "./modules/kopp14/oceandynamics/IncludeDABZOSModels.py"
-      - "./modules/kopp14/oceandynamics/SmoothZOSTOGA.py"
-      - "./modules/kopp14/oceandynamics/DriftCorr.py"
-      - "./modules/kopp14/oceandynamics/Smooth.py"
-      - "./modules/kopp14/oceandynamics/read_locationfile.py"
-      - "./modules/kopp14/oceandynamics/read_CSIRO.py"
-      - "./modules/kopp14/oceandynamics/readMarzeion.py"
-      - "./modules/kopp14/oceandynamics/data/kopp14_oceandynamics_data.tgz"
+      - "%MODULE_PATH%/kopp14_preprocess_oceandynamics.py"
+      - "%MODULE_PATH%/IncludeModels.py"
+      - "%MODULE_PATH%/IncludeDABZOSModels.py"
+      - "%MODULE_PATH%/SmoothZOSTOGA.py"
+      - "%MODULE_PATH%/DriftCorr.py"
+      - "%MODULE_PATH%/Smooth.py"
+      - "%MODULE_PATH%/read_locationfile.py"
+      - "%MODULE_PATH%/read_CSIRO.py"
+      - "%MODULE_PATH%/readMarzeion.py"
+    upload_and_extract_input_data:
+      - "%MODULE_PATH%/data/kopp14_oceandynamics_data.tgz"
     copy_shared_data:
       - '$SHARED/location.lst'
 #    download_output_data:
@@ -43,12 +44,11 @@ fit:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: []
     script: "kopp14_fit_oceandynamics.py"
     options:
       - "pipeline_id"
     upload_input_data:
-      - './modules/kopp14/oceandynamics/kopp14_fit_oceandynamics.py'
+      - '%MODULE_PATH%/kopp14_fit_oceandynamics.py'
     copy_input_data:
       preprocess:
         task1:
@@ -64,14 +64,13 @@ project:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: []
     script: "kopp14_project_oceandynamics.py"
     options:
       - "pipeline_id"
       - "nsamps"
       - "seed"
     upload_input_data:
-      - './modules/kopp14/oceandynamics/kopp14_project_oceandynamics.py'
+      - '%MODULE_PATH%/kopp14_project_oceandynamics.py'
     copy_input_data:
       preprocess:
         task1:
@@ -92,14 +91,13 @@ postprocess:
       process-type: None
       threads-per-process: 1
       thread-type: None
-    pre_exec: []
     script: "kopp14_postprocess_oceandynamics.py"
     options:
       - "nsamps"
       - "seed"
       - "pipeline_id"
     upload_input_data:
-      - './modules/kopp14/oceandynamics/kopp14_postprocess_oceandynamics.py'
+      - '%MODULE_PATH%/kopp14_postprocess_oceandynamics.py'
     copy_input_data:
       preprocess:
         task1:
