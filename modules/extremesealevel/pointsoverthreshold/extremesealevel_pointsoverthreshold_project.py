@@ -85,7 +85,7 @@ def getFreqFromZ_ESL(scale, shape, loc, avg_exceed, z, mhhw, mhhwFreq):
 	log_freq[sub] = np.log(avg_exceed) + ( np.log(mhhwFreq)-np.log(avg_exceed) )*(z0[sub]/(mhhw-loc)) #from Gumbel (see Buchanan et al. 2016 & LocalizeSL) for testz<loc (logN linear in z, assume MHHW once every 2 days)
 	freq[sub] = np.exp( log_freq[sub] )
 	
-	freq[np.less(freq, 1e-6, where=~np.isnan(freq))] = np.nan #throw away frequencies lower than 1e-6 (following SROCC scripts)
+	#freq[np.less(freq, 1e-6, where=~np.isnan(freq))] = np.nan #throw away frequencies lower than 1e-6 (following SROCC scripts)
 	
 	return freq
 
@@ -94,7 +94,7 @@ def getFreqFromZ_ESL(scale, shape, loc, avg_exceed, z, mhhw, mhhwFreq):
 def project_station(station_data, slproj_data, proj_qnts, testz, allowance_freq, nsamps, seed, output_filename):
 	
 	# Seed the RNG
-	np.random.seed(seed)
+	rng = np.random.default_rng(seed)
 	
 	# Extract the sea-level projection data
 	lcl_msl_samples = slproj_data['proj_slc'] / 1000.0
@@ -115,7 +115,7 @@ def project_station(station_data, slproj_data, proj_qnts, testz, allowance_freq,
 	gp_cov = station_data['gp_cov'] #covariance matrix
 	avg_exceed = station_data['avg_exceed'] #average number of exceedences of threshold per year (lambda)
 	
-	gp_samples = np.random.multivariate_normal([shape,scale], gp_cov,size=nsamps)
+	gp_samples = rng.multivariate_normal([shape,scale], gp_cov,size=nsamps)
 	shape_samples = gp_samples[:,0]
 	scale_samples = gp_samples[:,1]
 	scale_samples[scale_samples<0.001] = 0.001 #no negative scales
@@ -152,10 +152,10 @@ def project_station(station_data, slproj_data, proj_qnts, testz, allowance_freq,
 	allowances = testz_mat[idx_alwfreq_fut,np.arange(0,len(idx_alwfreq_fut))] - testz_mat[idx_alwfreq_hist,np.arange(0,len(idx_alwfreq_hist))]
 
 	#get quantiles from these
-	hist_freqs_qnts = np.nanpercentile(hist_freqs_mat,proj_qnts,axis=1)
-	fut_freqs_qnts = np.nanpercentile(fut_freqs_mat,proj_qnts,axis=1)
-	allowances_qnts = np.nanpercentile(allowances,proj_qnts)
-	ampfactors_qnts = np.nanpercentile(ampfactors,proj_qnts)
+	hist_freqs_qnts = np.nanquantile(hist_freqs_mat,proj_qnts,axis=1)
+	fut_freqs_qnts = np.nanquantile(fut_freqs_mat,proj_qnts,axis=1)
+	allowances_qnts = np.nanquantile(allowances,proj_qnts)
+	ampfactors_qnts = np.nanquantile(ampfactors,proj_qnts)
 
 	
 	#-------------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ def project_station(station_data, slproj_data, proj_qnts, testz, allowance_freq,
 	id_var[:] = site_id
 	year_var[:] = proj_years
 	q_var[:] = proj_qnts
-	localslq[:] = np.quantile(lcl_msl_samples,proj_qnts) / 1000.0  # Convert to meters
+	localslq[:] = np.quantile(lcl_msl_samples,proj_qnts) 
 	heights_var[:] = testz
 	loc_var[:] = loc
 	mhhw_var[:] = mhhw

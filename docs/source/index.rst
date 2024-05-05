@@ -18,9 +18,9 @@ FACTS is being developed by the `Earth System Science & Policy Lab <http://www.e
 FACTS is released under the 
 `MIT License <http://opensource.org/licenses/MIT>`_. 
 
-.. note:: Please use the following to reference Ensemble Toolkit
+.. note:: Please use the following to reference FACTS
 
-   Kopp, R. E., Garner, G. G., Hermans, T. H. J., Jha, S., Kumar, P., Slangen, A. B. A., Turilli, M., Edwards, T. L., Gregory, J. M., Koubbe, G., Levermann, A., Merzky, A., Nowicki, S., Palmer, M. D., & Smith, C. (in prep.). The Framework for Assessing Changes To Sea-Level (FACTS) v1.0-rc: A platform for characterizing parametric and structural uncertainty in future global, relative, and extreme sea-level change. Geoscientific Model Development.
+   Kopp, R. E., Garner, G. G., Hermans, T. H. J., Jha, S., Kumar, P., Reedy, A., Slangen, A. B. A., Turilli, M., Edwards, T. L., Gregory, J. M., Koubbe, G., Levermann, A., Merzky, A., Nowicki, S., Palmer, M. D., & Smith, C. (2023). The Framework for Assessing Changes To Sea-Level (FACTS) v1.0: A platform for characterizing parametric and structural uncertainty in future global, relative, and extreme sea-level change. Geoscientific Model Development, 16, 7461–7489. https://doi.org/10.5194/gmd-16-7461-2023
 
 **Project Github Page:** https://github.com/radical-collaboration/facts
 
@@ -33,6 +33,8 @@ FACTS is released under the
    quickstart.rst
    resources.rst
    configurationfiles.rst
+   misc.rst
+   whitepapers.rst
 
 Indices and tables
 ==================
