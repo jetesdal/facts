@@ -197,10 +197,14 @@ def tlm_fit_oceandynamics(pipeline_id):
 	# Trim sZOSTOGAadj to same year range as sZOS
 	sZOSTOGAadj = sZOSTOGAadj[year_idx,:]
 
+    # Initialize OceanDynTECorr as an array
+    OceanDynTECorr = np.zeros((len(datayears[year_idx]), len(focus_site_ids)))
+
 	# Calculate the correlation of ZOS with thermal expansion if needed
 	# Note: Correlation returns 'np.nan' if 'corr_denom' == 0
 	if no_correlation:
-		OceanDynTECorr = 0.0
+		#OceanDynTECorr = 0.0
+        OceanDynTECorr.fill(0.0)
 	else:
 		zos_demean = sZOS - np.nanmean(sZOS, axis=1)[:,np.newaxis,:]
 		zostoga_demean = sZOSTOGAadj - np.nanmean(sZOSTOGAadj, axis=1)[:,np.newaxis]
