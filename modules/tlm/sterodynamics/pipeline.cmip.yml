@@ -80,9 +80,14 @@ project:
       preprocess:
         task1:
           - "%PIPELINE_ID%_tlmdata.pkl"
+        task2:
+          - "%PIPELINE_ID%_config.pkl"
+          - "%PIPELINE_ID%_ZOSTOGA.pkl"
       fit:
         task1:
           - "%PIPELINE_ID%_tlmfit.pkl"
+        task2:
+          - "%PIPELINE_ID%_thermalexp_fit.pkl"
     global_total_files:
       - "%PIPELINE_ID%_globalsl.nc"
 
