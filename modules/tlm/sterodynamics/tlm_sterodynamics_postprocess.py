@@ -240,7 +240,38 @@ def tlm_postprocess_oceandynamics(nsamps, rng_seed, chunksize, keep_temp, pipeli
 
 	# Close the netcdf
 	rootgrp.close()
-
+	
+	# Produce the intermediate zos/zostoga output netCDF file =========================
+	
+	# Read interim ZOS and ZOSTOGA data file ------------------------------------
+	infile = "{}_zos_fit_combined.pkl".format(pipeline_id)
+	try:
+		f = open(infile, 'rb')
+	except:
+		print("Cannot open infile\n")
+		raise
+	# Extract the data from the file
+	interim_data = pickle.load(f)
+	f.close()
+	# ------------------------------------
+	# Save to xarray dataset
+	ds_out = xr.Dataset({'zos': (['year', 'model', 'location'], interim_data['sZOS']),
+			     'zostoga': (['year', 'model'], interim_data['sZOSTOGAadj'])},
+			    coords={'year': interim_data['zosyears'],
+				    'model': interim_data['comb_modellist'],
+				    'location': interim_data['focus_site_ids'],
+				    'latitude': (('location'), interim_data['focus_site_lats']),
+				    'longitude': (('location'), interim_data['focus_site_lons'])})
+	
+	# Assign attributes
+	ds_out.attrs['description'] = "ZOS and ZOSTOGA intermediate dataset"
+	ds_out.attrs['history'] = "Created " + time.ctime(time.time())
+	ds_out.attrs['source'] = "FACTS: {0} - {1}. ".format(pipeline_id, scenario)
+	ds_out['latitude'].attrs['units'] = "Degrees North"
+	ds_out['longitude'].attrs['units'] = "Degrees East"
+	
+	# Write the dataset to a netCDF file
+	ds_out.to_netcdf("{}_CMIP.nc".format(pipeline_id), format="NETCDF4")
 
 	return(None)
 
