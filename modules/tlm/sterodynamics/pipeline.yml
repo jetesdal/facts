@@ -113,3 +113,4 @@ postprocess:
       - "%PIPELINE_ID%_localsl.nc"
     download_output_data:
       - "%PIPELINE_ID%_OceanDyn.nc"
+      - "%PIPELINE_ID%_CMIP.nc"
