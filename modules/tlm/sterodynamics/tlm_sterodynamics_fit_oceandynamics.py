@@ -254,6 +254,15 @@ def tlm_fit_oceandynamics(pipeline_id):
 	outfile = open(os.path.join(os.path.dirname(__file__), "{}_oceandynamics_fit.pkl".format(pipeline_id)), 'wb')
 	pickle.dump(output, outfile,protocol=4)
 	outfile.close()
+	
+	# Write processed ZOS and ZOSTOGA variables to a file
+	output = {'sZOS': sZOS, 'zos_modellist': zos_modellist, 'zos_scenariolist': my_zos['zos_scenariolist'], 'zosyears': OceanDynYears, \
+		  'focus_site_ids': focus_site_ids, 'focus_site_lats': focus_site_lats, 'focus_site_lons': my_zos["focus_site_lons"], \
+		  'sZOSTOGAadj': sZOSTOGAadj, 'comb_modellist': comb_modellist, 'sZOSTOGA': sZOSTOGA, 'zostoga_modellist': zostoga_modellist, \
+		  'zostoga_scenariolist': my_zostoga['zostoga_scenariolist'], 'zostogayears': datayears}
+	outfile = open(os.path.join(os.path.dirname(__file__), "{}_zos_fit_combined.pkl".format(pipeline_id)), 'wb')
+	pickle.dump(output, outfile, protocol=4)
+	outfile.close()
 
 if __name__ == '__main__':
 
