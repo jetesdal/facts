@@ -110,6 +110,7 @@ postprocess:
         task2:
           - "%PIPELINE_ID%_thermalexp_fit.pkl"
           - "%PIPELINE_ID%_oceandynamics_fit.pkl"
+          - "%PIPELINE_ID%_zos_fit_combined.pkl"
       project:
         task1:
           - "%PIPELINE_ID%_projections.pkl"
