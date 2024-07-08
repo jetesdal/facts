@@ -195,6 +195,9 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	# Merging is done in the postprocessing stage automatically.
 	mergeZOSZOSTOGA = 0
 
+	# Always subset the models to overlap
+	subset_overlap = 1
+
 	# Read in the ZOSTOGA data
 	(zostoga_modellist, zostoga_scenariolist, ZOSTOGA) = IncludeCMIP6Models(zostoga_modeldir,'zostoga', datayears, include_models, include_scenarios)
 
@@ -244,7 +247,7 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	#bug, set 'ZOSTOGAadj' to a subset of 'sZOSTOGA' instead of 'ZOSTOGA'.
 	'''
 	# If no_correlation, do not subset the models to overlap
-	if no_correlation:
+	if no_correlation and not subset_overlap:
 		ZOSTOGAadj = sZOSTOGA # Replicate potential bug
 		#ZOSTOGAadj = ZOSTOGA  # Fix for potential bug
 	else:
