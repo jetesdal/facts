@@ -49,6 +49,7 @@ def tlm_postprocess_oceandynamics(nsamps, rng_seed, chunksize, keep_temp, pipeli
 	baseyear = my_data['baseyear']
 	GCMprobscale = my_data['GCMprobscale']
 	no_correlation = my_data['no_correlation']
+	subset_overlap = my_data['subset_overlap']
 
 	# Read in the ZOS data file ------------------------------------
 	infile = "{}_ZOS.pkl".format(pipeline_id)
@@ -255,13 +256,26 @@ def tlm_postprocess_oceandynamics(nsamps, rng_seed, chunksize, keep_temp, pipeli
 	f.close()
 	# ------------------------------------
 	# Save to xarray dataset
-	ds_out = xr.Dataset({'zos': (['year', 'model', 'location'], interim_data['sZOS']),
-			     'zostoga': (['year', 'model'], interim_data['sZOSTOGAadj'])},
-			    coords={'year': interim_data['zosyears'],
-				    'model': interim_data['comb_modellist'],
-				    'location': interim_data['focus_site_ids'],
-				    'latitude': (('location'), interim_data['focus_site_lats']),
-				    'longitude': (('location'), interim_data['focus_site_lons'])})
+	
+	if no_correlation and not subset_overlap:
+		# Save to xarray dataset with separate coordinates for model_zos and model_zostoga
+		ds_out = xr.Dataset({'zos': (['year', 'model_zos', 'location'], interim_data['sZOS']),
+				     'zostoga': (['year', 'model_zostoga'], interim_data['sZOSTOGAadj'])},
+				    coords={'year': interim_data['zosyears'],
+					    'model_zos': interim_data['zos_modellist'],
+					    'model_zostoga': interim_data['zostoga_modellist'],
+					    'location': interim_data['focus_site_ids'],
+					    'latitude': (('location'), interim_data['focus_site_lats']),
+					    'longitude': (('location'), interim_data['focus_site_lons'])})
+	else:
+		# Save to xarray dataset with the same coordinates for model
+		ds_out = xr.Dataset({'zos': (['year', 'model', 'location'], interim_data['sZOS']),
+				     'zostoga': (['year', 'model'], interim_data['sZOSTOGAadj'])},
+				    coords={'year': interim_data['zosyears'],
+					    'model': interim_data['comb_modellist'],
+					    'location': interim_data['focus_site_ids'],
+					    'latitude': (('location'), interim_data['focus_site_lats']),
+					    'longitude': (('location'), interim_data['focus_site_lons'])})
 	
 	# Assign attributes
 	ds_out.attrs['description'] = "ZOS and ZOSTOGA intermediate dataset"
