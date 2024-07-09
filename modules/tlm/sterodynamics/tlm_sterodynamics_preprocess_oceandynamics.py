@@ -237,6 +237,10 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 
 	# Load the ZOS data
 	(zos_modellist, zos_scenariolist, ZOS_raw) = IncludeCMIP6ZOSModels(zos_modeldir, "zos", datayears, include_models, include_scenarios, focus_site_lats, focus_site_lons)
+	
+	# Do not include UKESM1-0-LL because of faulty data
+	if 'UKESM1-0-LL' in zos_modellist:
+		zos_modellist.remove('UKESM1-0-LL')
 
 	# Find the overlap between ZOS and ZOSTOGA
 	comb_modellist, zostoga_model_idx, zos_model_idx = np.intersect1d(zostoga_modellist, zos_modellist, return_indices=True)
