@@ -326,7 +326,7 @@ if __name__ == '__main__':
 
 	parser.add_argument('--no_correlation', help="Do not apply the correlation between ZOS and ZOSTOGA fields", type=int, choices=[0,1], default=0)
 	parser.add_argument('--subset_overlap', help="Subset the models so that the same models are used for ZOS and ZOSTOGA", type=int, choices=[0,1], default=0)
-	parser.add_argument('--exclude_cmip_models, help="Comma-separated list of CMIP models to exclude", default="")
+	parser.add_argument('--exclude_cmip_models', help="Comma-separated list of CMIP models to exclude", default="")
 
 	parser.add_argument('--pyear_start', help="Year for which projections start [default=2000]", default=2020, type=int)
 	parser.add_argument('--pyear_end', help="Year for which projections end [default=2300]", default=2300, type=int)
