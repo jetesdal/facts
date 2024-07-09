@@ -29,6 +29,7 @@ preprocess:
       - "model_dir"
       - "no_drift_corr"
       - "no_correlation"
+      - "subset_overlap"
     upload_input_data:
       - "IncludeCMIP6Models.py"
       - "IncludeCMIP6ZOSModels.py"
