@@ -164,7 +164,7 @@ def tas_limit_filter(tasdir, temp_target, temp_target_window=0.25, ref_syear=185
 
 
 
-def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, subset_overlap, pyear_start, pyear_end, pyear_step, locationfilename, baseyear, pipeline_id):
+def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, subset_overlap, exclude_cmip_models, pyear_start, pyear_end, pyear_step, locationfilename, baseyear, pipeline_id):
 
 	# Define variables
 	datayears = np.arange(1861,2301)
@@ -178,6 +178,9 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	zos_modeldir = os.path.join(modeldir, "zos")
 	zostoga_modeldir = os.path.join(modeldir, "zostoga")
 	(include_models, include_scenarios) = FindInputModels(tasdir, zos_modeldir, scenario)
+	
+	# Extract list of models that should be excluded
+	exclude_models = exclude_cmip_models.split(',')
 
 	if(not include_models):
 		raise Exception("No models found for this scenario or temperature target - {}".format(scenario))
@@ -239,8 +242,11 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	(zos_modellist, zos_scenariolist, ZOS_raw) = IncludeCMIP6ZOSModels(zos_modeldir, "zos", datayears, include_models, include_scenarios, focus_site_lats, focus_site_lons)
 	
 	# Do not include UKESM1-0-LL because of faulty data
-	if 'UKESM1-0-LL' in zos_modellist:
-		zos_modellist.remove('UKESM1-0-LL')
+	#if 'UKESM1-0-LL' in zos_modellist:
+	#	zos_modellist.remove('UKESM1-0-LL')
+	
+	# Remove models to be excluded
+	zos_modellist = [model for model in zos_modellist if model not in exclude_models]
 
 	# Find the overlap between ZOS and ZOSTOGA
 	comb_modellist, zostoga_model_idx, zos_model_idx = np.intersect1d(zostoga_modellist, zos_modellist, return_indices=True)
@@ -320,6 +326,7 @@ if __name__ == '__main__':
 
 	parser.add_argument('--no_correlation', help="Do not apply the correlation between ZOS and ZOSTOGA fields", type=int, choices=[0,1], default=0)
 	parser.add_argument('--subset_overlap', help="Subset the models so that the same models are used for ZOS and ZOSTOGA", type=int, choices=[0,1], default=0)
+	parser.add_argument('--exclude_cmip_models, help="Comma-separated list of CMIP models to exclude", default="")
 
 	parser.add_argument('--pyear_start', help="Year for which projections start [default=2000]", default=2020, type=int)
 	parser.add_argument('--pyear_end', help="Year for which projections end [default=2300]", default=2300, type=int)
@@ -349,7 +356,7 @@ if __name__ == '__main__':
 	if os.path.isfile(configfile) and os.path.isfile(zostogafile) and os.path.isfile(zosfile):
 		print("{}, {}, and {} found, skipping OD preprocessing".format(configfile, zostogafile, zosfile))
 	else:
-		tlm_preprocess_oceandynamics(scenario_dsl, args.model_dir, not args.no_drift_corr, args.no_correlation, args.subset_overlap, args.pyear_start, args.pyear_end, args.pyear_step, args.locationfile, args.baseyear, args.pipeline_id)
+		tlm_preprocess_oceandynamics(scenario_dsl, args.model_dir, not args.no_drift_corr, args.no_correlation, args.subset_overlap, args.exclude_cmip_models, args.pyear_start, args.pyear_end, args.pyear_step, args.locationfile, args.baseyear, args.pipeline_id)
 
 	# Done
 	sys.exit()
