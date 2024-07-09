@@ -218,14 +218,15 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	pickle.dump(output, outfile, protocol=4)
 	outfile.close()
 
-	# Store the ZOSTOGA variables in a pickle
-	output = {'sZOSTOGA': sZOSTOGA, 'zostoga_modellist': zostoga_modellist, \
-				'zostoga_scenariolist': zostoga_scenariolist}
-
-	# Write the ZOSTOGA variables to a file
-	outfile = open(os.path.join(outdir, "{}_ZOSTOGA.pkl".format(pipeline_id)), 'wb')
-	pickle.dump(output, outfile, protocol=4)
-	outfile.close()
+	# Store the unadjusted ZOSTOGA variables in a pickle
+	if subset_overlap == 0:
+		output = {'sZOSTOGA': sZOSTOGA, 'zostoga_modellist': zostoga_modellist, \
+			  'zostoga_scenariolist': zostoga_scenariolist}
+		
+		# Write the ZOSTOGA variables to a file
+		outfile = open(os.path.join(outdir, "{}_ZOSTOGA.pkl".format(pipeline_id)), 'wb')
+		pickle.dump(output, outfile, protocol=4)
+		outfile.close()
 
 
 	#------------ Begin Ocean Dynamics ---------------------------------------------------
@@ -286,6 +287,16 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	outfile = open(os.path.join(outdir, "{}_ZOS.pkl".format(pipeline_id)), 'wb')
 	pickle.dump(output, outfile, protocol=4)
 	outfile.close()
+
+	# Store the adjusted ZOSTOGA variables in a pickle
+	if subset_overlap == 1:
+		output = {'sZOSTOGA': sZOSTOGAadj, 'zostoga_modellist': [zostoga_modellist[idx] for idx in zostoga_model_idx], \
+			  'zostoga_scenariolist': [zostoga_scenariolist[idx] for idx in zostoga_model_idx]}
+		
+		# Write the ZOSTOGA variables to a file
+		outfile = open(os.path.join(outdir, "{}_ZOSTOGA.pkl".format(pipeline_id)), 'wb')
+		pickle.dump(output, outfile, protocol=4)
+		outfile.close()
 
 
 
