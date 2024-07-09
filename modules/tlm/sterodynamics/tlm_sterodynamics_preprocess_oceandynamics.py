@@ -164,7 +164,7 @@ def tas_limit_filter(tasdir, temp_target, temp_target_window=0.25, ref_syear=185
 
 
 
-def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, pyear_start, pyear_end, pyear_step, locationfilename, baseyear, pipeline_id):
+def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, subset_overlap, pyear_start, pyear_end, pyear_step, locationfilename, baseyear, pipeline_id):
 
 	# Define variables
 	datayears = np.arange(1861,2301)
@@ -196,7 +196,7 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	mergeZOSZOSTOGA = 0
 
 	# Always subset the models to overlap
-	subset_overlap = 1
+	#subset_overlap = 1
 
 	# Read in the ZOSTOGA data
 	(zostoga_modellist, zostoga_scenariolist, ZOSTOGA) = IncludeCMIP6Models(zostoga_modeldir,'zostoga', datayears, include_models, include_scenarios)
@@ -210,7 +210,7 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	output = {'datayears': datayears, 'scenario': scenario, \
 		'targyears': targyears,	'mergeZOSZOSTOGA': mergeZOSZOSTOGA,\
 		'smoothwin': smoothwin, 'driftcorr': driftcorr, 'baseyear': baseyear,\
-		'GCMprobscale': GCMprobscale, 'maxDOF': maxDOF, 'no_correlation': no_correlation}
+		'GCMprobscale': GCMprobscale, 'maxDOF': maxDOF, 'no_correlation': no_correlation, 'subset_overlap': subset_overlap}
 
 	# Write the configuration to a file
 	outdir = os.path.dirname(__file__)
@@ -315,6 +315,7 @@ if __name__ == '__main__':
 	parser.add_argument('--no_drift_corr', help="Do not apply the drift correction", type=int, choices=[0,1], default=0)
 
 	parser.add_argument('--no_correlation', help="Do not apply the correlation between ZOS and ZOSTOGA fields", type=int, choices=[0,1], default=0)
+	parser.add_argument('--subset_overlap', help="Subset the models so that the same models are used for ZOS and ZOSTOGA", type=int, choices=[0,1], default=0)
 
 	parser.add_argument('--pyear_start', help="Year for which projections start [default=2000]", default=2020, type=int)
 	parser.add_argument('--pyear_end', help="Year for which projections end [default=2300]", default=2300, type=int)
@@ -344,7 +345,7 @@ if __name__ == '__main__':
 	if os.path.isfile(configfile) and os.path.isfile(zostogafile) and os.path.isfile(zosfile):
 		print("{}, {}, and {} found, skipping OD preprocessing".format(configfile, zostogafile, zosfile))
 	else:
-		tlm_preprocess_oceandynamics(scenario_dsl, args.model_dir, not args.no_drift_corr, args.no_correlation, args.pyear_start, args.pyear_end, args.pyear_step, args.locationfile, args.baseyear, args.pipeline_id)
+		tlm_preprocess_oceandynamics(scenario_dsl, args.model_dir, not args.no_drift_corr, args.no_correlation, args.subset_overlap, args.pyear_start, args.pyear_end, args.pyear_step, args.locationfile, args.baseyear, args.pipeline_id)
 
 	# Done
 	sys.exit()
