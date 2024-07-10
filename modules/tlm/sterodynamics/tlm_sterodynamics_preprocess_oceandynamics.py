@@ -181,6 +181,13 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	
 	# Extract list of models that should be excluded
 	exclude_models = exclude_cmip_models.split(',')
+	indices_to_remove = [midx for midx, modelstr in enumerate(include_models) if modelstr in exclude_models]
+	indices_to_remove.sort(reverse=True)
+	
+	# Remove models
+	for index_to_remove in indices_to_remove:
+		include_models.pop(index_to_remove)
+		include_scenarios.pop(index_to_remove)
 
 	if(not include_models):
 		raise Exception("No models found for this scenario or temperature target - {}".format(scenario))
@@ -240,13 +247,6 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 
 	# Load the ZOS data
 	(zos_modellist, zos_scenariolist, ZOS_raw) = IncludeCMIP6ZOSModels(zos_modeldir, "zos", datayears, include_models, include_scenarios, focus_site_lats, focus_site_lons)
-	
-	# Do not include UKESM1-0-LL because of faulty data
-	#if 'UKESM1-0-LL' in zos_modellist:
-	#	zos_modellist.remove('UKESM1-0-LL')
-	
-	# Remove models to be excluded
-	zos_modellist = [model for model in zos_modellist if model not in exclude_models]
 
 	# Find the overlap between ZOS and ZOSTOGA
 	comb_modellist, zostoga_model_idx, zos_model_idx = np.intersect1d(zostoga_modellist, zos_modellist, return_indices=True)
