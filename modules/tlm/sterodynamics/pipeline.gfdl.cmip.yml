@@ -38,7 +38,7 @@ preprocess:
       - "Smooth.py"
       - "read_locationfile.py"
     upload_and_extract_input_data:
-      - "tlm_sterodynamics_cmip6_v20220809_data.tgz"
+      - "tlm_sterodynamics_cmip6_data.tgz"
     copy_shared_data:
       - '$SHARED/location.lst'
 
@@ -67,7 +67,7 @@ fit:
 project:
   task1:
     executable: "python3"
-    script: "tlm_sterodynamics_project.py"
+    script: "tlm_sterodynamics_project_cmip.py"
     options:
       - "pipeline_id"
       - "nsamps"
@@ -82,9 +82,14 @@ project:
       preprocess:
         task1:
           - "%PIPELINE_ID%_tlmdata.pkl"
+        task2:
+          - "%PIPELINE_ID%_config.pkl"
+          - "%PIPELINE_ID%_ZOSTOGA.pkl"
       fit:
         task1:
           - "%PIPELINE_ID%_tlmfit.pkl"
+        task2:
+          - "%PIPELINE_ID%_thermalexp_fit.pkl"
     global_total_files:
       - "%PIPELINE_ID%_globalsl.nc"
 
