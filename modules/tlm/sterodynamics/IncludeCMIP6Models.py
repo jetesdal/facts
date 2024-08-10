@@ -60,13 +60,15 @@ def IncludeCMIP6Models(model_dir, varname, years, include_models, include_scenar
 		for runtype in ('historical',scenario):
 
 			#start of filename for runtype currently processed
-			filename_id = varname + '_Omon_' + model + '_' + runtype
+			#filename_id = varname + '_Omon_' + model + '_' + runtype
 
 			# find the historical or ssp file you want to read in for this model (exact filename depends on the experiment years)
 			filename=[]
 			for files_forModel in os.listdir(os.path.join(model_dir,model)): # loop through files in model folder
-				if files_forModel[0:len(filename_id)] == filename_id:
+				if (varname + '_Omon_' + model + '_' + runtype) in files_forModel or (varname + '_Oyr_' + model + '_' + runtype) in files_forModel:
+				#if files_forModel[0:len(filename_id)] == filename_id:
 					filename = files_forModel # assign filename
+					break
 
 			if not filename: #if the right filename cannot be found:
 				incorporate=False
