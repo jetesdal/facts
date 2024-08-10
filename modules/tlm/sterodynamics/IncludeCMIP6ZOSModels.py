@@ -124,13 +124,15 @@ def IncludeCMIP6ZOSModels(model_dir, varname, years, include_models, include_sce
 		for runtype in ('historical',scenario):
 
 			#start of filename for runtype currently processed
-			filename_id = varname + '_Omon_' + model + '_' + runtype
+			#filename_id = varname + '_Omon_' + model + '_' + runtype
 
 			# find the historical or ssp file you want to read in for this model (exact filename depends on the experiment years)
 			filename=[]
 			for files_forModel in os.listdir(os.path.join(model_dir,model)): # loop through files in model folder
-				if files_forModel[0:len(filename_id)] == filename_id:
+				if (varname + '_Omon_' + model + '_' + runtype) in files_forModel or (varname + '_Oyr_' + model + '_' + runtype) in files_forModel:
+				#if files_forModel[0:len(filename_id)] == filename_id:
 					filename = files_forModel # assign filename
+					break
 
 			if not filename: #if the right filename cannot be found:
 				incorporate=False
@@ -170,18 +172,22 @@ def IncludeCMIP6ZOSModels(model_dir, varname, years, include_models, include_sce
 				dat = nc_fid.variables[varname][:]
 				dat = np.array(dat.filled(np.nan))
 
-				# rearrange per year and compute average along year axis
-				dat = np.mean( np.reshape(dat, (int(dat.shape[0]/12),12,dat.shape[1],dat.shape[2])), axis=1 )
-
 				# Calculate the years
 				nctime = cftime.num2date(datatime, datatime.units, datatime.calendar)
 				datayrs = [int(x.strftime("%Y")) for x in nctime]
 				#start_time = datetime.datetime(year=1850, month=6, day=1, hour=0, minute=0, second=0)
 				#datayrs = [(start_time+datetime.timedelta(x)).year for x in datatime.data[0::12]]
 
+				# if monthly means, convert to annual
+				if datayrs[0] == datayrs[1]:
+					# rearrange per year and compute average along year axis
+					dat = np.mean( np.reshape(dat, (int(dat.shape[0]/12),12,dat.shape[1],dat.shape[2])), axis=1 )
+					datayrs = datayrs[0::12]
+
 				#store into dict for each cmip6 runtype
 				runtype_data[runtype] = np.array(dat).T
-				runtype_datayrs[runtype] = np.array(datayrs[::12])
+				runtype_datayrs[runtype] = np.array(datayrs)
+				#runtype_datayrs[runtype] = np.array(datayrs[::12]) # moved this to monthly to annual conversion
 				#runtype_data[runtype] = np.ma.array(dat).T
 				#runtype_datayrs[runtype] = np.ma.array(datayrs[::12])
 
