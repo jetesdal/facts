@@ -4,7 +4,7 @@
 preprocess:
   task1:
     executable: "python3"
-    python_dependencies: "numpy scipy netCDF4 pyyaml h5py"
+    python_dependencies: "numpy scipy netCDF4 pyyaml h5py momlevel"
     script: "tlm_sterodynamics_preprocess_thermalexpansion.py"
     options:
       - "scenario"
