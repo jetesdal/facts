@@ -6,16 +6,16 @@ import re
 import argparse
 import fnmatch
 from IncludeCMIP6Models import IncludeCMIP6Models
-from IncludeCMIP6ZOSModels import *
+from IncludeCMIP6ZOSModelsXload import *
 from SmoothZOSTOGA import SmoothZOSTOGA
 #from DriftCorr import DriftCorr
 from read_locationfile import ReadLocationFile
 from Smooth import Smooth
 
-''' tlm_preprocess_oceandynamics.py
+''' xtlm_preprocess_oceandynamics.py
 
 This runs the preprocessing stage for the ocean dynamics component of the IPCC AR6
-workflow.
+workflow. Use xarray and momlevel.
 
 Parameters:
 ssp_scenario = SSP scenario of interest
@@ -246,7 +246,7 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	(_, focus_site_ids, focus_site_lats, focus_site_lons) = ReadLocationFile(locationfile)
 
 	# Load the ZOS data
-	(zos_modellist, zos_scenariolist, ZOS_raw) = IncludeCMIP6ZOSModels(zos_modeldir, "zos", datayears, include_models, include_scenarios, focus_site_lats, focus_site_lons)
+	(zos_modellist, zos_scenariolist, ZOS_raw) = IncludeCMIP6ZOSModelsXload(zos_modeldir, "zos", datayears, include_models, include_scenarios, focus_site_lats, focus_site_lons, focus_site_ids, _)
 
 	# Find the overlap between ZOS and ZOSTOGA
 	comb_modellist, zostoga_model_idx, zos_model_idx = np.intersect1d(zostoga_modellist, zos_modellist, return_indices=True)
