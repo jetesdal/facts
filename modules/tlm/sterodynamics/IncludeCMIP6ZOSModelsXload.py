@@ -69,7 +69,6 @@ def IncludeCMIP6ZOSModelsXload(model_dir, varname, years, include_models, includ
                     filename = files_forModel  # assign filename
                     break
                     
-            print(filename)
             if not filename:  # if the right filename cannot be found:
                 incorporate = False
                 
