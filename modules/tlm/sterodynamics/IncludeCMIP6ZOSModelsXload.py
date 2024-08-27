@@ -29,7 +29,7 @@ def IncludeCMIP6ZOSModelsXload(model_dir, varname, years, include_models, includ
 
     # Save to csv file to feed into momlevel function
     df = pd.DataFrame({'PSMSL_site': focus_sites_names,'PSMSLID': focus_sites_ids,'lat': focus_sites_lats,'lon': focus_sites_lons})
-    df.to_csv(locationfilename.replace('lst','csv'), index=False)
+    df.to_csv('location.csv', index=False)
 
     # Initialize the model list and data matrix
     model_list = []
@@ -133,8 +133,7 @@ def IncludeCMIP6ZOSModelsXload(model_dir, varname, years, include_models, includ
             mask = (~da_shifted.mean('year').isnull()).astype(int)
             
             # Extract time series from each location
-            ds_tg = momlevel.extract_tidegauge(da_shifted,xcoord='lon',ycoord='lat',mask=mask,threshold=max_dist,
-                                               csv=locationfilename.replace('lst','csv'))
+            ds_tg = momlevel.extract_tidegauge(da_shifted,xcoord='lon',ycoord='lat',mask=mask,threshold=max_dist,csv='location.csv')
             
             # Add missing variables with NaN values
             for site in focus_sites_names:
