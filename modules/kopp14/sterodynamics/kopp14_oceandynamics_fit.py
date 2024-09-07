@@ -265,7 +265,13 @@ def kopp14_fit_oceandynamics(pipeline_id):
 	outfile = open(os.path.join(os.path.dirname(__file__), "{}_oceandynamics_fit.pkl".format(pipeline_id)), 'wb')
 	pickle.dump(output, outfile)
 	outfile.close()
-
+	
+	# Write processed ZOS and ZOSTOGA variables to a file
+	output = {'sZOS': sZOS_full, 'sZOSTOGA': sZOSTOGA, 'datayears': datayears, 'comb_modellist': comb_modellist, \
+		  'focus_site_ids': focus_site_ids, 'focus_site_lats': focus_site_lats, 'focus_site_lons': my_zos['focus_site_lons']}
+	outfile = open(os.path.join(os.path.dirname(__file__), "{}_zos_fit_combined.pkl".format(pipeline_id)), 'wb')
+	pickle.dump(output, outfile, protocol=4)
+	outfile.close()
 
 if __name__ == '__main__':
 
