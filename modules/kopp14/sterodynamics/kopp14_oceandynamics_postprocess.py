@@ -8,6 +8,7 @@ import re
 from scipy.stats import norm
 from scipy.stats import t
 from netCDF4 import Dataset
+import xarray as xr
 
 ''' kopp14_postprocess_oceandynamics.py
 
