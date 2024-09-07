@@ -185,6 +185,55 @@ def kopp14_postprocess_oceandynamics(nsamps, rng_seed, pipeline_id):
 	# Close the netcdf
 	dset.close()
 
+	# Produce the intermediate data output netCDF file =========================
+
+	# Produce the included model string
+	model_string_pieces = ["{0}-{1}".format(modellist[x], rcp_scenario) for x in np.arange(len(modellist))]
+	model_string = "Models and scenarios included: " + ", ".join(model_string_pieces)
+
+	# Write the localized projections to a netcdf file
+	rootgrp = Dataset(os.path.join(os.path.dirname(__file__), "{}_OceanDyn.nc".format(pipeline_id)), "w", format="NETCDF4")
+	
+	# Define Dimensions
+	site_dim = rootgrp.createDimension("nsites", nsites)
+	odyear_dim = rootgrp.createDimension("OceanDynYears", len(OceanDynYears))
+	
+	# Populate dimension variables
+	lat_var = rootgrp.createVariable("lat", "f4", ("nsites",))
+	lon_var = rootgrp.createVariable("lon", "f4", ("nsites",))
+	id_var = rootgrp.createVariable("id", "i4", ("nsites",))
+	odyear_var = rootgrp.createVariable("OceanDynYears", "i4", ("OceanDynYears",))
+	
+	# Create a data variable
+	oceandynmean = rootgrp.createVariable("OceanDynMean", "f4", ("nsites", "OceanDynYears"))
+	oceandynstd = rootgrp.createVariable("OceanDynStd", "f4", ("nsites", "OceanDynYears"))
+	oceandynn = rootgrp.createVariable("OceanDynN", "i4", ("nsites", "OceanDynYears"))
+	oceandyntecorr = rootgrp.createVariable("OceanDynTECorr", "f4", ("nsites", "OceanDynYears"))
+	oceandyndof = rootgrp.createVariable("OceanDynDOF", "i4", ("nsites", "OceanDynYears"))
+	
+	# Assign attributes
+	rootgrp.description = "Ocean Dynamics intermediate data for the K14 workflow"
+	rootgrp.history = "Created " + time.ctime(time.time())
+	rootgrp.source = "FACTS: {0} - {1}. ".format(pipeline_id, rcp_scenario) + model_string
+	lat_var.units = "Degrees North"
+	lon_var.units = "Degrees East"
+	
+	# Put the data into the netcdf variables
+	lat_var[:] = focus_site_lats
+	lon_var[:] = focus_site_lons
+	id_var[:] = focus_site_ids
+	odyear_var[:] = OceanDynYears
+	oceandynmean[:,:] = OceanDynMean.T
+	oceandynstd[:,:] = OceanDynStd.T
+	oceandynn[:,:] = OceanDynN.T
+	oceandyntecorr[:,:] = OceanDynTECorr.T
+	oceandyndof[:,:] = OceanDynDOF.T
+	
+	# Close the netcdf
+	rootgrp.close()
+
+	# Produce the intermediate zos/zostoga output netCDF file =========================
+
 	return(None)
 
 
