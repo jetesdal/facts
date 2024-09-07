@@ -159,6 +159,7 @@ def kopp14_fit_oceandynamics(pipeline_id):
 	#-------------------- Begin Ocean Dynamics -------------------------------------------
 
 	# Pick out indices for year between 2000 and 2100 (consistent with K14) and trim data
+	sZOS_full = sZOS.copy()
 	sZOS = sZOS[year_idx,:,:]
 
 	# Determine which locations have enough models initially to warrant further
