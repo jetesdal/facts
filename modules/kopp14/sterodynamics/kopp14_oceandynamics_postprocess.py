@@ -58,6 +58,7 @@ def kopp14_postprocess_oceandynamics(nsamps, rng_seed, pipeline_id):
 	focus_site_ids = my_data['focus_site_ids']
 	focus_site_lats = my_data['focus_site_lats']
 	focus_site_lons = my_data['focus_site_lons']
+	modellist = my_data['comb_modellist']
 
 	# Read in the TE fit data file --------------------------------
 	infile = "{}_thermalexp_fit.pkl".format(pipeline_id)
