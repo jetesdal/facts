@@ -148,27 +148,27 @@ def kopp14_postprocess_oceandynamics(nsamps, rng_seed, pipeline_id):
 
 
 	# Write the localized projections to a netcdf file
-	rootgrp = Dataset(os.path.join(os.path.dirname(__file__), "{}_localsl.nc".format(pipeline_id)), "w", format="NETCDF4")
-
+	dset = Dataset(os.path.join(os.path.dirname(__file__), "{}_localsl.nc".format(pipeline_id)), "w", format="NETCDF4")
+	
 	# Define Dimensions
-	year_dim = rootgrp.createDimension("years", ntimes)
-	samp_dim = rootgrp.createDimension("samples", nsamps)
-	loc_dim  = rootgrp.createDimension("locations", nsites)
+	year_dim = dset.createDimension("years", ntimes)
+	samp_dim = dset.createDimension("samples", nsamps)
+	loc_dim  = dset.createDimension("locations", nsites)
 
 	# Populate dimension variables
-	year_var = rootgrp.createVariable("years", "i4", ("years",))
-	samp_var = rootgrp.createVariable("samples", "i8", ("samples",))
-	loc_var  = rootgrp.createVariable("locations", "i8", ("locations",))
-	lat_var  = rootgrp.createVariable("lat", "f4", ("locations",))
-	lon_var  = rootgrp.createVariable("lon", "f4", ("locations",))
+	year_var = dset.createVariable("years", "i4", ("years",))
+	samp_var = dset.createVariable("samples", "i8", ("samples",))
+	loc_var  = dset.createVariable("locations", "i8", ("locations",))
+	lat_var  = dset.createVariable("lat", "f4", ("locations",))
+	lon_var  = dset.createVariable("lon", "f4", ("locations",))
 
 	# Create a data variable
-	samps = rootgrp.createVariable("sea_level_change", "f4", ("samples", "years", "locations"), zlib=True, least_significant_digit=2)
+	samps = dset.createVariable("sea_level_change", "f4", ("samples", "years", "locations"), zlib=True, least_significant_digit=2)
 
 	# Assign attributes
-	rootgrp.description = "Local SLR contributions from ocean dynamics according to K14 workflow"
-	rootgrp.history = "Created " + time.ctime(time.time())
-	rootgrp.source = "FACTS: {0} - {1}. ".format(pipeline_id, rcp_scenario)
+	dset.description = "Local SLR contributions from ocean dynamics according to K14 workflow"
+	dset.history = "Created " + time.ctime(time.time())
+	dset.source = "FACTS: {0} - {1}. ".format(pipeline_id, rcp_scenario)
 	lat_var.units = "Degrees North"
 	lon_var.units = "Degrees East"
 	samps.units = "mm"
@@ -182,7 +182,7 @@ def kopp14_postprocess_oceandynamics(nsamps, rng_seed, pipeline_id):
 	samps[:,:,:] = local_sl
 
 	# Close the netcdf
-	rootgrp.close()
+	dset.close()
 
 	return(None)
 
