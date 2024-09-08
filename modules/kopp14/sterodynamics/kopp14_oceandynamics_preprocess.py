@@ -21,6 +21,9 @@ rcp_scenario = RCP scenario of interest (default = "rcp85")
 zostoga_modeldir = Directory that contains the ZOSTOGA model data
 zos_modeldir = Directory that contains the ZOS model data (in *.mat format)
 driftcorr = Apply the drift correction?
+no_correlation = Flag to not apply correlation between DSL and GMTSL
+merge_zos_zostoga = Flag to merge ZOS and ZOSTOGA
+exclude_cmip_models = Comma-separated list of models to exclude in preprocessing
 locationfilename = File that contains points for localization
 pipeline_id = Unique identifier for the pipeline running this code
 
