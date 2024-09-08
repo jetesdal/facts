@@ -194,7 +194,7 @@ if __name__ == '__main__':
 
 
 	# Pass the model directory in via command line
-	kopp14_preprocess_oceandynamics(args.scenario, args.zostoga_model_dir, args.zos_model_dir, args.no_drift_corr, args.no_correlation, args.merge_zos_zostoga, args.exclude_cmip_models, args.baseyear, args.pyear_start, args.pyear_end, args.pyear_step, args.locationfile, args.pipeline_id)
+	kopp14_preprocess_oceandynamics(args.scenario, args.zostoga_model_dir, args.zos_model_dir, not args.no_drift_corr, args.no_correlation, args.merge_zos_zostoga, args.exclude_cmip_models, args.baseyear, args.pyear_start, args.pyear_end, args.pyear_step, args.locationfile, args.pipeline_id)
 
 	# Done
 	exit()
