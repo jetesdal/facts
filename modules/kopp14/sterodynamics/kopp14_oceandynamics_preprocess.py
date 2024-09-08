@@ -27,13 +27,14 @@ pipeline_id = Unique identifier for the pipeline running this code
 
 '''
 
-def kopp14_preprocess_oceandynamics(rcp_scenario, zostoga_modeldir, zos_modeldir, driftcorr, baseyear, pyear_start, pyear_end, pyear_step, locationfilename, pipeline_id):
+def kopp14_preprocess_oceandynamics(rcp_scenario, zostoga_modeldir, zos_modeldir, driftcorr, no_correlation, merge_zos_zostoga, exclude_cmip_models, baseyear, pyear_start, pyear_end, pyear_step, locationfilename, pipeline_id):
 
 	# Define variables
 	datayears = np.arange(1861,2300)
 	targyears = np.arange(pyear_start, pyear_end+1, pyear_step)
 	targyears = np.union1d(targyears, baseyear)
-	mergeZOSZOSTOGA = True
+	#mergeZOSZOSTOGA = True
+	mergeZOSZOSTOGA = merge_zos_zostoga
 	smoothwin = 19
 	GCMprobscale = 0.833
 	maxDOF = np.iinfo(np.int32).max
@@ -42,6 +43,10 @@ def kopp14_preprocess_oceandynamics(rcp_scenario, zostoga_modeldir, zos_modeldir
 	# Read in the ZOSTOGA data
 	zostoga_modeldir = os.path.join(zostoga_modeldir, rcp_scenario)
 	(zostoga_modellist, ZOSTOGA) = IncludeModels(zostoga_modeldir, ("ZOSTOGA", "ZOSGA"), datayears)
+
+	# Extract list of models that should be excluded
+	exclude_models = exclude_cmip_models.split(',')
+	### WIP: Need to figure out how to make sure that models are excluded in a consistent way
 
 	# Center, suture, and smooth ZOSTOGA
 	sZOSTOGA = np.nan * ZOSTOGA
@@ -61,7 +66,7 @@ def kopp14_preprocess_oceandynamics(rcp_scenario, zostoga_modeldir, zos_modeldir
 	output = {'rcp_scenario': rcp_scenario, 'datayears': datayears,\
 		'targyears': targyears,	'mergeZOSZOSTOGA': mergeZOSZOSTOGA,\
 		'smoothwin': smoothwin, 'driftcorr': driftcorr, 'baseyear': baseyear,\
-		'GCMprobscale': GCMprobscale, 'maxDOF': maxDOF}
+		'GCMprobscale': GCMprobscale, 'maxDOF': maxDOF, 'no_correlation': no_correlation}
 
 	# Write the configuration to a file
 	outdir = os.path.dirname(__file__)
