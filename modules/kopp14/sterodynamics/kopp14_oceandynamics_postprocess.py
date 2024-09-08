@@ -44,6 +44,8 @@ def kopp14_postprocess_oceandynamics(nsamps, rng_seed, pipeline_id):
 	rcp_scenario = my_data['rcp_scenario']
 	GCMprobscale = my_data['GCMprobscale']
 	maxDOF = my_data['maxDOF']
+	mergeZOSZOSTOGA = my_data["mergeZOSZOSTOGA"]
+	no_correlation = my_data["no_correlation"]
 
 	# Read in the ZOS data file ------------------------------------
 	infile = "{}_ZOS.pkl".format(pipeline_id)
@@ -142,11 +144,18 @@ def kopp14_postprocess_oceandynamics(nsamps, rng_seed, pipeline_id):
 			te_year_ind = np.argmin(np.abs(ThermExpYears - targyear))
 
 			# Calculate the conditional mean and sd
-			condmean = OceanDynMean[od_year_ind,this_site_ind] +  OceanDynStd[od_year_ind,this_site_ind] * OceanDynTECorr[od_year_ind,this_site_ind] * (tesamps[:,j]-ThermExpMean[te_year_ind])/ThermExpStd[te_year_ind]
-			condstd = (ThermExpScale * OceanDynStd[od_year_ind,this_site_ind]) * np.sqrt(1 - OceanDynTECorr[od_year_ind,this_site_ind]**2)
+			if no_correlation:
+				condmean = OceanDynMean[od_year_ind,this_site_ind]
+				condstd = (ThermExpScale * OceanDynStd[od_year_ind,site_idx])
+			else:
+				condmean = OceanDynMean[od_year_ind,this_site_ind] +  OceanDynStd[od_year_ind,this_site_ind] * OceanDynTECorr[od_year_ind,this_site_ind] * (tesamps[:,j]-ThermExpMean[te_year_ind])/ThermExpStd[te_year_ind]
+				condstd = (ThermExpScale * OceanDynStd[od_year_ind,this_site_ind]) * np.sqrt(1 - OceanDynTECorr[od_year_ind,this_site_ind]**2)
 
 			# Make the projection
 			local_sl[:,j,i] = t.ppf(norm.cdf(norm_inv_perm),OceanDynDOF[od_year_ind,this_site_ind]) * condstd + condmean
+			
+			if not (mergeZOSZOSTOGA):
+				local_sl[:,j,i] += tesamps[:,j]
 
 
 	# Write the localized projections to a netcdf file
