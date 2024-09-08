@@ -157,10 +157,10 @@ if __name__ == '__main__':
 	parser.add_argument('--zos_model_dir', help="Directory containing ZOS GCM output",\
 	default=os.path.join(os.path.dirname(__file__), "zosfinal"))
 
-	parser.add_argument('--no_drift_corr', help="Do not apply the drift correction", action='store_true')
+	parser.add_argument('--no_drift_corr', help="Do not apply the drift correction", type=int, choices=[0,1], default=0)
 	
 	parser.add_argument('--no_correlation', help="Do not apply the correlation between ZOS and ZOSTOGA fields", type=int, choices=[0,1], default=0)
-	parser.add_argument('--merge_zos_zostoga', help="Merge ZOS and ZOSTOGA in preprocessing step", action='store_true')
+	parser.add_argument('--merge_zos_zostoga', help="Merge ZOS and ZOSTOGA in preprocessing step", type=int, choices=[0,1], default=1)
 	parser.add_argument('--exclude_cmip_models', help="Comma-separated list of CMIP models to exclude", default="")
 
 	parser.add_argument('--baseyear', help="Base or reference year for projetions [default=2000]", default=2000, type=int)
@@ -191,7 +191,7 @@ if __name__ == '__main__':
 
 
 	# Pass the model directory in via command line
-	kopp14_preprocess_oceandynamics(args.scenario, args.zostoga_model_dir, args.zos_model_dir, not args.no_drift_corr, args.no_correlation, args.merge_zos_zostoga, args.exclude_cmip_models, args.baseyear, args.pyear_start, args.pyear_end, args.pyear_step, args.locationfile, args.pipeline_id)
+	kopp14_preprocess_oceandynamics(args.scenario, args.zostoga_model_dir, args.zos_model_dir, args.no_drift_corr, args.no_correlation, args.merge_zos_zostoga, args.exclude_cmip_models, args.baseyear, args.pyear_start, args.pyear_end, args.pyear_step, args.locationfile, args.pipeline_id)
 
 	# Done
 	exit()
