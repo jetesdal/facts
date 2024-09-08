@@ -146,7 +146,7 @@ def kopp14_postprocess_oceandynamics(nsamps, rng_seed, pipeline_id):
 			# Calculate the conditional mean and sd
 			if no_correlation:
 				condmean = OceanDynMean[od_year_ind,this_site_ind]
-				condstd = (ThermExpScale * OceanDynStd[od_year_ind,site_idx])
+				condstd = (ThermExpScale * OceanDynStd[od_year_ind,this_site_ind])
 			else:
 				condmean = OceanDynMean[od_year_ind,this_site_ind] +  OceanDynStd[od_year_ind,this_site_ind] * OceanDynTECorr[od_year_ind,this_site_ind] * (tesamps[:,j]-ThermExpMean[te_year_ind])/ThermExpStd[te_year_ind]
 				condstd = (ThermExpScale * OceanDynStd[od_year_ind,this_site_ind]) * np.sqrt(1 - OceanDynTECorr[od_year_ind,this_site_ind]**2)
