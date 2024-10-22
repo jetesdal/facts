@@ -11,6 +11,7 @@ from SmoothZOSTOGA import SmoothZOSTOGA
 #from DriftCorr import DriftCorr
 from read_locationfile import ReadLocationFile
 from Smooth import Smooth
+import scipy.stats as stats
 
 ''' tlm_preprocess_oceandynamics.py
 
@@ -211,6 +212,25 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	# Read in the ZOSTOGA data
 	(zostoga_modellist, zostoga_scenariolist, ZOSTOGA) = IncludeCMIP6Models(zostoga_modeldir,'zostoga', datayears, include_models, include_scenarios)
 
+	# Extrapolate ZOSTOGA beyond 2100 to accommodate 19-year smoothing
+	for j in range(ZOSTOGA.shape[1]):
+		idx = np.isfinite(ZOSTOGA[:, j])
+		yrs = datayears[idx]
+		arr = ZOSTOGA[idx, j]
+		
+		# Only extrapolate for models that have no data after 2110
+		if (yrs[-1] <= 2110) & (len(arr) >= 30):
+			
+			# Generate years for extrapolation
+			yrs_extrap = np.arange(yrs[-1] + 1, yrs[-1] + 11)
+			
+			# Perform linear regression on the last 30 years of valid data
+			slope, intercept, _, _, _ = stats.linregress(yrs[-30:], arr[-30:])
+			arr_extrap = slope * yrs_extrap + intercept
+			
+			# Update the ZOSTOGA array with the extrapolated values (replacing NaNs)
+			ZOSTOGA[yrs[-1] - datayears[0] + 1 : yrs[-1] - datayears[0] + 11, j] = arr_extrap
+
 	# Center, suture, and smooth ZOSTOGA
 	sZOSTOGA = np.nan * ZOSTOGA
 	for i in np.arange(0,ZOSTOGA.shape[1]):
@@ -271,6 +291,26 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 		ZOS = ZOS_raw + ZOSTOGAadj[:,:,np.newaxis]
 	else:
 		ZOS = ZOS_raw
+
+	# Extrapolate ZOS beyond 2100 to accommodate 19-year smoothing
+	# Loop over locations
+	for k in range(ZOS.shape[2]):
+		# Loop over models
+		for j in range(ZOS.shape[1]):
+			idx = np.isfinite(ZOS[:, j, k])
+			yrs = datayears[idx]
+			arr = ZOS[idx, j, k]
+			if (yrs[-1]<=2110) & (len(arr) >= 30):
+				
+				# Generate years for extrapolation
+				yrs_extrap = np.arange(yrs[-1] + 1, yrs[-1] + 11)
+				
+				# Perform linear regression on the last 30 years of valid data
+				slope, intercept, _, _, _ = stats.linregress(yrs[-30:], arr[-30:])
+				arr_extrap = slope * yrs_extrap + intercept
+				
+				# Update the ZOS array with the extrapolated values (replacing NaNs)
+				ZOS[yrs[-1] - datayears[0] + 1 : yrs[-1] - datayears[0] + 11, j, k] = arr_extrap
 
 	# Smooth ZOS and ZOSTOGA over 19 year smoothing window
 	def nanSmooth(x, w):
