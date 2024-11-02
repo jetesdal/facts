@@ -278,7 +278,8 @@ def tlm_fit_oceandynamics(pipeline_id):
 	output = {'sZOS': sZOS, 'zos_modellist': zos_modellist, 'zos_scenariolist': my_zos['zos_scenariolist'], 'zosyears': OceanDynYears, \
 		  'focus_site_ids': focus_site_ids, 'focus_site_lats': focus_site_lats, 'focus_site_lons': my_zos["focus_site_lons"], \
 		  'sZOSTOGAadj': sZOSTOGAadj, 'sTASadj': sTASadj, 'comb_modellist': comb_modellist, 'sZOSTOGA': sZOSTOGA, 'zostoga_modellist': zostoga_modellist, \
-		  'zostoga_scenariolist': my_zostoga['zostoga_scenariolist'], 'zostogayears': datayears}
+		  'zostoga_scenariolist': my_zostoga['zostoga_scenariolist'], 'zostogayears': datayears, 'sTAS': sTAS, 'tas_modellist': tas_modellist, \
+		  'tas_scenariolist': my_tas['tas_scenariolist'], 'tasyears': datayears}
 	outfile = open(os.path.join(os.path.dirname(__file__), "{}_zos_fit_combined.pkl".format(pipeline_id)), 'wb')
 	pickle.dump(output, outfile, protocol=4)
 	outfile.close()
