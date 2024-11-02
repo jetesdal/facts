@@ -382,7 +382,7 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	# Store the ZOS variable in a pickle
 	output = {'sZOS': sZOS, 'zos_modellist': zos_modellist, 'zos_scenariolist': zos_scenariolist, 'datayears': datayears, \
 				'focus_site_ids': focus_site_ids, 'focus_site_lats': focus_site_lats, \
-				'focus_site_lons': focus_site_lons, 'sZOSTOGAadj': sZOSTOGAadj, 'comb_modellist': comb_modellist}
+				'focus_site_lons': focus_site_lons, 'sZOSTOGAadj': sZOSTOGAadj, 'sTASadj': sTASadj, 'comb_modellist': comb_modellist}
 
 	# Write the ZOS variables to a file
 	outfile = open(os.path.join(outdir, "{}_ZOS.pkl".format(pipeline_id)), 'wb')
