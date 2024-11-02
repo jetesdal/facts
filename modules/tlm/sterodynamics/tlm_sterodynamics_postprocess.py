@@ -260,17 +260,20 @@ def tlm_postprocess_oceandynamics(nsamps, rng_seed, chunksize, keep_temp, pipeli
 	if no_correlation and not subset_overlap:
 		# Save to xarray dataset with separate coordinates for model_zos and model_zostoga
 		ds_out = xr.Dataset({'zos': (['year', 'model_zos', 'location'], interim_data['sZOS']),
-				     'zostoga': (['year', 'model_zostoga'], interim_data['sZOSTOGAadj'])},
+				     'zostoga': (['year', 'model_zostoga'], interim_data['sZOSTOGAadj']),
+				     'tas': (['year', 'model_tas'], interim_data['sTASadj'])},
 				    coords={'year': interim_data['zosyears'],
 					    'model_zos': interim_data['zos_modellist'],
 					    'model_zostoga': interim_data['zostoga_modellist'],
+					    'model_tas': interim_data['tas_modellist'],
 					    'location': interim_data['focus_site_ids'],
 					    'latitude': (('location'), interim_data['focus_site_lats']),
 					    'longitude': (('location'), interim_data['focus_site_lons'])})
 	else:
 		# Save to xarray dataset with the same coordinates for model
 		ds_out = xr.Dataset({'zos': (['year', 'model', 'location'], interim_data['sZOS']),
-				     'zostoga': (['year', 'model'], interim_data['sZOSTOGAadj'])},
+				     'zostoga': (['year', 'model'], interim_data['sZOSTOGAadj']),
+				     'tas': (['year', 'model'], interim_data['sTASadj'])},
 				    coords={'year': interim_data['zosyears'],
 					    'model': interim_data['comb_modellist'],
 					    'location': interim_data['focus_site_ids'],
