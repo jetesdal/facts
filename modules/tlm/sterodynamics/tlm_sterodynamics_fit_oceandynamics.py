@@ -36,6 +36,20 @@ def tlm_fit_oceandynamics(pipeline_id):
 	no_correlation = my_config["no_correlation"]
 	maxDOF = my_config["maxDOF"]
 
+	# Load the TAS file
+	tasfile = "{}_TAS.pkl".format(pipeline_id)
+	try:
+		f = open(tasfile, 'rb')
+	except:
+		print("Cannot open TAS file\n")
+
+	# Extract the TAS variables
+	my_tas = pickle.load(f)
+	f.close()
+
+	sTAS = my_tas["sTAS"]
+	tas_modellist = my_tas['tas_modellist']
+
 	# Load the ZOSTOGA file
 	zostogafile = "{}_ZOSTOGA.pkl".format(pipeline_id)
 	try:
@@ -63,6 +77,7 @@ def tlm_fit_oceandynamics(pipeline_id):
 
 	sZOS = my_zos["sZOS"]
 	sZOSTOGAadj = my_zos["sZOSTOGAadj"]
+	sTASadj = my_zos["sTASadj"]
 	focus_site_lats = my_zos["focus_site_lats"]
 	focus_site_ids = my_zos["focus_site_ids"]
 	comb_modellist = my_zos["comb_modellist"]
@@ -196,6 +211,10 @@ def tlm_fit_oceandynamics(pipeline_id):
 
 	# Trim sZOSTOGAadj to same year range as sZOS
 	sZOSTOGAadj = sZOSTOGAadj[year_idx,:]
+
+	# Trim sTASadj to same year range as sZOS
+	sTASadj = sTASadj[year_idx,:]
+
 	
 	# Initialize OceanDynTECorr as an array
 	OceanDynTECorr = np.zeros((len(datayears[year_idx]), len(focus_site_ids)))
@@ -258,7 +277,7 @@ def tlm_fit_oceandynamics(pipeline_id):
 	# Write processed ZOS and ZOSTOGA variables to a file
 	output = {'sZOS': sZOS, 'zos_modellist': zos_modellist, 'zos_scenariolist': my_zos['zos_scenariolist'], 'zosyears': OceanDynYears, \
 		  'focus_site_ids': focus_site_ids, 'focus_site_lats': focus_site_lats, 'focus_site_lons': my_zos["focus_site_lons"], \
-		  'sZOSTOGAadj': sZOSTOGAadj, 'comb_modellist': comb_modellist, 'sZOSTOGA': sZOSTOGA, 'zostoga_modellist': zostoga_modellist, \
+		  'sZOSTOGAadj': sZOSTOGAadj, 'sTASadj': sTASadj, 'comb_modellist': comb_modellist, 'sZOSTOGA': sZOSTOGA, 'zostoga_modellist': zostoga_modellist, \
 		  'zostoga_scenariolist': my_zostoga['zostoga_scenariolist'], 'zostogayears': datayears}
 	outfile = open(os.path.join(os.path.dirname(__file__), "{}_zos_fit_combined.pkl".format(pipeline_id)), 'wb')
 	pickle.dump(output, outfile, protocol=4)
