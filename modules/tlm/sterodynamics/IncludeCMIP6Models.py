@@ -6,7 +6,7 @@ from netCDF4 import Dataset
 
 ''' IncludeCMIP6Models.py
 
-This script parses through a directory of models and loads annual mean 'zostoga' data from each model.
+This script parses through a directory of models and loads annual mean data from each model.
 A directory structure of 'variable'>'Model' is expected.
 PiControl, Historical and SSP files are expected for each model, if not the model is excluded from the ensemble.
 
@@ -19,8 +19,8 @@ include_scenario  = List of scenarios to attempt to include
 
 Return:
 model_list	= Vector of model names that are to be included (nmodels)
-ZOSTOGA		= Global average thermosteric sea-level change (years, nmodels)
-CONTROL_ZOSTOGA = Global average thermosteric sea-level change of piControl run (years,nmodels)
+VAR		= Global average variable (e.g., ZOSTOGA: thermosteric sea-level chang) (years, nmodels)
+CONTROL_VAR     = Global average variable of piControl run (years,nmodels)
 
 Note: The original code (Matlab version from Kopp14) includes both ZOSTOGA and ZOSGA,
 though it's not apparent to me why these are being treated as the same quantity. ZOSTOGA
@@ -33,7 +33,8 @@ def IncludeCMIP6Models(model_dir, varname, years, include_models, include_scenar
 	# Initialize the model list and data matrix
 	model_list = []
 	scenario_list = []
-	init_zostoga = True
+	init_var = True
+	realm = 'O' if varname[:3]=='zos' else 'A'
 
 	# Loop through available models in model_dir
 	for i in np.arange(len(include_models)):
@@ -65,7 +66,7 @@ def IncludeCMIP6Models(model_dir, varname, years, include_models, include_scenar
 			# find the historical or ssp file you want to read in for this model (exact filename depends on the experiment years)
 			filename=[]
 			for files_forModel in os.listdir(os.path.join(model_dir,model)): # loop through files in model folder
-				if (varname + '_Omon_' + model + '_' + runtype) in files_forModel or (varname + '_Oyr_' + model + '_' + runtype) in files_forModel:
+				if (varname + '_%smon_'%realm + model + '_' + runtype) in files_forModel or (varname + '_%syr_'%realm + model + '_' + runtype) in files_forModel:
 				#if files_forModel[0:len(filename_id)] == filename_id:
 					filename = files_forModel # assign filename
 					break
@@ -105,20 +106,20 @@ def IncludeCMIP6Models(model_dir, varname, years, include_models, include_scenar
 			#interpolate to requested years, add nans where no data available
 			data_to_append = np.interp(years, fullyrs, fulldata, left=np.nan, right=np.nan)
 
-			# If this model produces nan for ZOSTOGA or CONTROL_ZOSTOGA, remove the model
+			# If this model produces nan for VAR or CONTROL_VAR, remove the model
 			if(np.all(np.isnan(data_to_append))):
 				continue
 
-			if(init_zostoga): # if first model
-				ZOSTOGA = data_to_append
-				init_zostoga = False
+			if(init_var): # if first model
+				VAR = data_to_append
+				init_var = False
 			else:
-				ZOSTOGA = np.vstack((ZOSTOGA, data_to_append)) #stack arrays for the different models
+				VAR = np.vstack((VAR, data_to_append)) #stack arrays for the different models
 
 			model_list.append(model) #list of model names
 			scenario_list.append(scenario) #list of scenarios
 
-	return(model_list, scenario_list, np.transpose(ZOSTOGA))
+	return(model_list, scenario_list, np.transpose(VAR))
 
 
 	''' #from previous version, Greg's code for quality-flagging pre-processed CMIP5:
