@@ -209,6 +209,34 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	# Always subset the models to overlap
 	#subset_overlap = 1
 
+	# Read in the TAS data
+	(tas_modellist, tas_scenariolist, TAS) = IncludeCMIP6Models(tasdir,'tas', datayears, include_models, include_scenarios)
+
+	# Extrapolate TAS beyond 2100 to accommodate 19-year smoothing
+	for j in range(TAS.shape[1]):
+		idx = np.isfinite(TAS[:, j])
+		yrs = datayears[idx]
+		arr = TAS[idx, j]
+		
+		# Only extrapolate for models that have no data after 2110
+		if (yrs[-1] <= 2110) & (len(arr) >= 30):
+			
+			# Generate years for extrapolation
+			yrs_extrap = np.arange(yrs[-1] + 1, yrs[-1] + 11)
+			
+			# Perform linear regression on the last 30 years of valid data
+			slope, intercept, _, _, _ = stats.linregress(yrs[-30:], arr[-30:])
+			arr_extrap = slope * yrs_extrap + intercept
+			
+			# Update the ZOSTOGA array with the extrapolated values (replacing NaNs)
+			TAS[yrs[-1] - datayears[0] + 1 : yrs[-1] - datayears[0] + 11, j] = arr_extrap
+
+	# Center, suture, and smooth TAS
+	sTAS = np.nan * TAS
+	for i in np.arange(0,TAS.shape[1]):
+		(TAS[:,i], sTAS[:,i]) = SmoothZOSTOGA(TAS[:,i], datayears, baseyear, smoothwin)
+			
+
 	# Read in the ZOSTOGA data
 	(zostoga_modellist, zostoga_scenariolist, ZOSTOGA) = IncludeCMIP6Models(zostoga_modeldir,'zostoga', datayears, include_models, include_scenarios)
 
@@ -248,7 +276,7 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	pickle.dump(output, outfile, protocol=4)
 	outfile.close()
 
-	# Store the unadjusted ZOSTOGA variables in a pickle
+	# Store the unadjusted TAS and ZOSTOGA variables in a pickle
 	if subset_overlap == 0:
 		output = {'sZOSTOGA': sZOSTOGA, 'zostoga_modellist': zostoga_modellist, \
 			  'zostoga_scenariolist': zostoga_scenariolist}
@@ -257,6 +285,23 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 		outfile = open(os.path.join(outdir, "{}_ZOSTOGA.pkl".format(pipeline_id)), 'wb')
 		pickle.dump(output, outfile, protocol=4)
 		outfile.close()
+
+		output = {'sTAS': sTAS, 'tas_modellist': tas_modellist, \
+			  'tas_scenariolist': tas_scenariolist}
+		
+		# Write the TAS variables to a file
+		outfile = open(os.path.join(outdir, "{}_TAS.pkl".format(pipeline_id)), 'wb')
+		pickle.dump(output, outfile, protocol=4)
+		outfile.close()
+
+	# Find the overlap between TAS and ZOSTOGA
+	combgm_modellist, tas_model_idx, zostoga_model_idx = np.intersect1d(tas_modellist, zostoga_modellist, return_indices=True)
+	tas_scenariolist = [tas_scenariolist[idx] for idx in tas_model_idx]
+	zostoga_scenariolist = [zostoga_scenariolist[idx] for idx in zostoga_model_idx]
+	sTAS = sTAS[:,tas_model_idx]
+	sZOSTOGA = sZOSTOGA[:,zostoga_model_idx]
+	TAS = TAS[:,tas_model_idx]
+	ZOSTOGA = ZOSTOGA[:,zostoga_model_idx]
 
 
 	#------------ Begin Ocean Dynamics ---------------------------------------------------
@@ -268,8 +313,8 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	# Load the ZOS data
 	(zos_modellist, zos_scenariolist, ZOS_raw) = IncludeCMIP6ZOSModels(zos_modeldir, "zos", datayears, include_models, include_scenarios, focus_site_lats, focus_site_lons)
 
-	# Find the overlap between ZOS and ZOSTOGA
-	comb_modellist, zostoga_model_idx, zos_model_idx = np.intersect1d(zostoga_modellist, zos_modellist, return_indices=True)
+	# Find the overlap between ZOS and ZOSTOGA/TAS
+	comb_modellist, combgm_model_idx, zos_model_idx = np.intersect1d(combgm_modellist, zos_modellist, return_indices=True)
 
 	'''
 	#NOTE: POTENTIAL BUG IN ORIGINAL CODE
@@ -279,11 +324,15 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	'''
 	# If no_correlation, do not subset the models to overlap
 	if no_correlation and not subset_overlap:
+		TASadj = sTAS
+		#TASadj = TAS
 		ZOSTOGAadj = sZOSTOGA # Replicate potential bug
 		#ZOSTOGAadj = ZOSTOGA  # Fix for potential bug
 	else:
-		ZOSTOGAadj = sZOSTOGA[:,zostoga_model_idx]  # Replicate potential bug
-		#ZOSTOGAadj = ZOSTOGA[:,zostoga_model_idx]  # Fix for potential bug
+		TASadj = sTAS[:,combgm_model_idx]
+		#TASadj = TAS[:,combgm_model_idx]
+		ZOSTOGAadj = sZOSTOGA[:,combgm_model_idx]  # Replicate potential bug
+		#ZOSTOGAadj = ZOSTOGA[:,combgm_model_idx]  # Fix for potential bug
 		ZOS_raw = ZOS_raw[:, zos_model_idx, :]
 
 	# Should we merge ZOSTOGA and ZOS?
@@ -322,11 +371,13 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 
 	sZOS = np.apply_along_axis(nanSmooth, axis=0, arr=ZOS, w=smoothwin)
 	sZOSTOGAadj = np.apply_along_axis(nanSmooth, axis=0, arr=ZOSTOGAadj, w=smoothwin)
+	sTASadj = np.apply_along_axis(nanSmooth, axis=0, arr=TASadj, w=smoothwin)
 
 	# Center the smoothed ZOS/ZOSTOGAadj to the baseyear
 	baseyear_idx = np.flatnonzero(datayears == baseyear)
 	sZOS = np.apply_along_axis(lambda z, idx: z - z[idx], axis=0, arr=sZOS, idx=baseyear_idx)
 	sZOSTOGAadj = np.apply_along_axis(lambda z, idx: z - z[idx], axis=0, arr=sZOSTOGAadj, idx=baseyear_idx)
+	sTASadj = np.apply_along_axis(lambda z, idx: z - z[idx], axis=0, arr=sTASadj, idx=baseyear_idx)
 
 	# Store the ZOS variable in a pickle
 	output = {'sZOS': sZOS, 'zos_modellist': zos_modellist, 'zos_scenariolist': zos_scenariolist, 'datayears': datayears, \
@@ -340,14 +391,21 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 
 	# Store the adjusted ZOSTOGA variables in a pickle
 	if subset_overlap == 1:
-		output = {'sZOSTOGA': sZOSTOGAadj, 'zostoga_modellist': [zostoga_modellist[idx] for idx in zostoga_model_idx], \
-			  'zostoga_scenariolist': [zostoga_scenariolist[idx] for idx in zostoga_model_idx]}
+		output = {'sZOSTOGA': sZOSTOGAadj, 'zostoga_modellist': [combgm_modellist[idx] for idx in combgm_model_idx], \
+			  'zostoga_scenariolist': [zostoga_scenariolist[idx] for idx in combgm_model_idx]}
 		
 		# Write the ZOSTOGA variables to a file
 		outfile = open(os.path.join(outdir, "{}_ZOSTOGA.pkl".format(pipeline_id)), 'wb')
 		pickle.dump(output, outfile, protocol=4)
 		outfile.close()
-
+		
+		output = {'sTAS': sTASadj, 'tas_modellist': [combgm_modellist[idx] for idx in combgm_model_idx], \
+			  'tas_scenariolist': [tas_scenariolist[idx] for idx in combgm_model_idx]}
+		
+		# Write the TAS variables to a file
+		outfile = open(os.path.join(outdir, "{}_TAS.pkl".format(pipeline_id)), 'wb')
+		pickle.dump(output, outfile, protocol=4)
+		outfile.close()
 
 
 if __name__ == '__main__':
@@ -386,6 +444,7 @@ if __name__ == '__main__':
 	configfile = os.path.join(outdir, "{}_config.pkl".format(args.pipeline_id))
 	zostogafile = os.path.join(outdir, "{}_ZOSTOGA.pkl".format(args.pipeline_id))
 	zosfile = os.path.join(outdir, "{}_ZOS.pkl".format(args.pipeline_id))
+	tasfile = os.path.join(outdir, "{}_TAS.pkl".format(args.pipeline_id))
 	tlmfile = os.path.join(outdir, "{}_tlmdata.pkl".format(args.pipeline_id))
 
 	# Run the OD preprocessing if intermediate files are not present
