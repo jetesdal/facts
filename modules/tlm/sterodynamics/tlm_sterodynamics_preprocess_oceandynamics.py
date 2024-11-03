@@ -348,6 +348,9 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 		for j in range(ZOS.shape[1]):
 			idx = np.isfinite(ZOS[:, j, k])
 			yrs = datayears[idx]
+			# Skip if no valid data for given model and location
+			if len(yrs)==0:
+				continue
 			arr = ZOS[idx, j, k]
 			if (yrs[-1]<=2110) & (len(arr) >= 30):
 				
