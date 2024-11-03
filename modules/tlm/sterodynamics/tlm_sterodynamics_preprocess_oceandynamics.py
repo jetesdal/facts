@@ -216,6 +216,9 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	for j in range(TAS.shape[1]):
 		idx = np.isfinite(TAS[:, j])
 		yrs = datayears[idx]
+		# Skip if no valid data for given model and location
+		if len(yrs)==0:
+			continue
 		arr = TAS[idx, j]
 		
 		# Only extrapolate for models that have no data after 2110
@@ -244,6 +247,9 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	for j in range(ZOSTOGA.shape[1]):
 		idx = np.isfinite(ZOSTOGA[:, j])
 		yrs = datayears[idx]
+		# Skip if no valid data for given model and location
+		if len(yrs)==0:
+			continue
 		arr = ZOSTOGA[idx, j]
 		
 		# Only extrapolate for models that have no data after 2110
