@@ -38,7 +38,7 @@ preprocess:
       - "Smooth.py"
       - "read_locationfile.py"
     upload_and_extract_input_data:
-      - "tlm_sterodynamics_cmip6_v20220826_data.tgz"
+      - "tlm_sterodynamics_cmip6_v20221104_data.tgz"
     copy_shared_data:
       - '$SHARED/location.lst'
 
@@ -63,6 +63,7 @@ fit:
           - "%PIPELINE_ID%_config.pkl"
           - "%PIPELINE_ID%_ZOSTOGA.pkl"
           - "%PIPELINE_ID%_ZOS.pkl"
+          - "%PIPELINE_ID%_TAS.pkl"
 
 project:
   task1:
