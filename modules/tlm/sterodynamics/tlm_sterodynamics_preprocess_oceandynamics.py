@@ -330,15 +330,15 @@ def tlm_preprocess_oceandynamics(scenario, modeldir, driftcorr, no_correlation, 
 	'''
 	# If no_correlation, do not subset the models to overlap
 	if no_correlation and not subset_overlap:
-		TASadj = sTAS
-		#TASadj = TAS
-		ZOSTOGAadj = sZOSTOGA # Replicate potential bug
-		#ZOSTOGAadj = ZOSTOGA  # Fix for potential bug
+		#TASadj = sTAS # Replicate potential bug
+		TASadj = TAS # Fix for potential bug
+		#ZOSTOGAadj = sZOSTOGA # Replicate potential bug
+		ZOSTOGAadj = ZOSTOGA  # Fix for potential bug
 	else:
-		TASadj = sTAS[:,combgm_model_idx]
-		#TASadj = TAS[:,combgm_model_idx]
-		ZOSTOGAadj = sZOSTOGA[:,combgm_model_idx]  # Replicate potential bug
-		#ZOSTOGAadj = ZOSTOGA[:,combgm_model_idx]  # Fix for potential bug
+		#TASadj = sTAS[:,combgm_model_idx]  # Replicate potential bug
+		TASadj = TAS[:,combgm_model_idx] # Fix for potential bug
+		#ZOSTOGAadj = sZOSTOGA[:,combgm_model_idx]  # Replicate potential bug
+		ZOSTOGAadj = ZOSTOGA[:,combgm_model_idx]  # Fix for potential bug
 		ZOS_raw = ZOS_raw[:, zos_model_idx, :]
 
 	# Should we merge ZOSTOGA and ZOS?
