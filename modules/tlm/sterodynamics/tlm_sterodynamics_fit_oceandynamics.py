@@ -211,9 +211,11 @@ def tlm_fit_oceandynamics(pipeline_id):
 
 	# Trim sZOSTOGAadj to same year range as sZOS
 	sZOSTOGAadj = sZOSTOGAadj[year_idx,:]
+	sZOSTOGA = sZOSTOGA[year_idx,:]
 
 	# Trim sTASadj to same year range as sZOS
 	sTASadj = sTASadj[year_idx,:]
+	sTAS = sTAS[year_idx,:]
 
 	
 	# Initialize OceanDynTECorr as an array
