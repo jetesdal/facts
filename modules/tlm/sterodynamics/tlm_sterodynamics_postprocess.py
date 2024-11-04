@@ -260,8 +260,8 @@ def tlm_postprocess_oceandynamics(nsamps, rng_seed, chunksize, keep_temp, pipeli
 	if no_correlation and not subset_overlap:
 		# Save to xarray dataset with separate coordinates for model_zos and model_zostoga
 		ds_out = xr.Dataset({'zos': (['year', 'model_zos', 'location'], interim_data['sZOS']),
-				     'zostoga': (['year', 'model_zostoga'], interim_data['sZOSTOGAadj']),
-				     'tas': (['year', 'model_tas'], interim_data['sTASadj'])},
+				     'zostoga': (['year', 'model_zostoga'], interim_data['sZOSTOGA']),
+				     'tas': (['year', 'model_tas'], interim_data['sTAS'])},
 				    coords={'year': interim_data['zosyears'],
 					    'model_zos': interim_data['zos_modellist'],
 					    'model_zostoga': interim_data['zostoga_modellist'],
