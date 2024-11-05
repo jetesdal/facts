@@ -51,14 +51,15 @@ def IncludeCMIP6Models(model_dir, varname, years, include_models, include_scenar
 		if model not in os.listdir(model_dir):
 			continue
 
-		# initialize lists to store data
-		runtype_data = {'historical':[],scenario:[]}
-		runtype_datayrs = {'historical':[],scenario:[]}
+		# Initialize lists to store data
+		runtype_data = {'historical': [], scenario: []}
+		runtype_datayrs = {'historical': [], scenario: []}
+		runtype_fnames = {'historical': [], scenario: []}
 
 		incorporate = True # incorporate model or not
 
-		# Read in control, historical and ssp data
-		for runtype in ('historical',scenario):
+		# Read in ssp and historical data   
+		for runtype in (scenario, 'historical'):
 
 			#start of filename for runtype currently processed
 			#filename_id = varname + '_Omon_' + model + '_' + runtype
@@ -66,10 +67,11 @@ def IncludeCMIP6Models(model_dir, varname, years, include_models, include_scenar
 			# find the historical or ssp file you want to read in for this model (exact filename depends on the experiment years)
 			filename=[]
 			for files_forModel in os.listdir(os.path.join(model_dir,model)): # loop through files in model folder
-				if (varname + '_%smon_'%realm + model + '_' + runtype) in files_forModel or (varname + '_%syr_'%realm + model + '_' + runtype) in files_forModel:
+				if (varname + f'_{realm}mon_' + model + '_' + runtype) in files_forModel or (varname + f'_{realm}yr_' + model + '_' + runtype) in files_forModel:
 				#if files_forModel[0:len(filename_id)] == filename_id:
-					filename = files_forModel # assign filename
-					break
+					if not any(np.any(runtype_data[item]) for item in runtype_data) or (files_forModel.split('_')[1] in runtype_fnames[scenario] and files_forModel.split('_')[4] in runtype_fnames[scenario]):
+						filename = files_forModel  # assign filename
+						break
 
 			if not filename: #if the right filename cannot be found:
 				incorporate=False
@@ -92,6 +94,7 @@ def IncludeCMIP6Models(model_dir, varname, years, include_models, include_scenar
 				#store into dict for each cmip6 runtype
 				runtype_data[runtype] = np.array(dat)
 				runtype_datayrs[runtype] = np.array(datayrs)
+				runtype_fnames[runtype] = filename
 
 		if(incorporate):
 			# check for overlap of historical and scenario datasets using data years
