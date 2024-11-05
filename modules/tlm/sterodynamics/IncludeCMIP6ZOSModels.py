@@ -134,7 +134,7 @@ def IncludeCMIP6ZOSModels(model_dir, varname, years, include_models, include_sce
 				#if files_forModel[0:len(filename_id)] == filename_id:
 					if not any(np.any(runtype_data[item]) for item in runtype_data) or (files_forModel.split('_')[1] in runtype_fnames[scenario] and files_forModel.split('_')[4] in runtype_fnames[scenario]):
 						filename = files_forModel # assign filename
-						break	
+						break
 
 			if not filename: #if the right filename cannot be found:
 				incorporate=False
