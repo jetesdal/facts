@@ -56,18 +56,20 @@ def IncludeCMIP6ZOSModelsXload(model_dir, varname, years, include_models, includ
         # Initialize lists to store data
         runtype_data = {'historical': [], scenario: []}
         runtype_datayrs = {'historical': [], scenario: []}
+        runtype_fnames = {'historical': [], scenario: []}
         
         incorporate = True  # incorporate model or not
         
         # Read in historical and ssp data
-        for runtype in ('historical', scenario):
+        for runtype in (scenario, 'historical'):
             
             # Find the historical or ssp file you want to read in for this model (exact filename depends on the experiment years)
             filename = []
             for files_forModel in os.listdir(os.path.join(model_dir, model)):  # loop through files in model folder
                 if (varname + '_Omon_' + model + '_' + runtype) in files_forModel or (varname + '_Oyr_' + model + '_' + runtype) in files_forModel:
-                    filename = files_forModel  # assign filename
-                    break
+                    if not any(np.any(runtype_data[item]) for item in runtype_data) or (files_forModel.split('_')[1] in runtype_fnames[scenario] and files_forModel.split('_')[4] in runtype_fnames[scenario]):
+                        filename = files_forModel
+                        break
                     
             if not filename:  # if the right filename cannot be found:
                 incorporate = False
@@ -110,6 +112,7 @@ def IncludeCMIP6ZOSModelsXload(model_dir, varname, years, include_models, includ
                 #store into dict for each cmip6 runtype
                 runtype_data[runtype] = dat
                 runtype_datayrs[runtype] = np.array(datayrs)
+                runtype_fnames[runtype] = filename
                 
         if incorporate:
             # Check for overlap of historical and scenario datasets using data years
