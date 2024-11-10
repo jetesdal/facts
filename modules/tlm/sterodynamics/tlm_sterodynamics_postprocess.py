@@ -225,6 +225,7 @@ def tlm_postprocess_oceandynamics(nsamps, rng_seed, chunksize, keep_temp, pipeli
 	rootgrp.description = "Ocean Dynamics intermediate data for the TLM workflow"
 	rootgrp.history = "Created " + time.ctime(time.time())
 	rootgrp.source = "FACTS: {0} - {1}. ".format(pipeline_id, scenario) + model_string
+	rootgrp.seed = str(rng_seed)
 	lat_var.units = "Degrees North"
 	lon_var.units = "Degrees East"
 
