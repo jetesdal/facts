@@ -146,6 +146,7 @@ def tlm_project_cmip(nsamps, seed, pipeline_id,scenario,pyear_start,pyear_end,py
 	rootgrp.source = "FACTS: {0}. ".format(pipeline_id) + model_string
 	rootgrp.baseyear = baseyear
 	rootgrp.scenario = scenario
+	rootgrp.seed = seed
 	samps.units = "mm"
 
 	# Put the data into the netcdf variables
