@@ -99,9 +99,9 @@ def tlm_project_cmip(nsamps, seed, pipeline_id,scenario,pyear_start,pyear_end,py
 		temp = t.ppf(norm.cdf(norm_inv_perm), ThermExpDOF[this_year_ind])
 		#temp = t.ppf(norm.cdf(norm_inv_perm), ThermExpDOF[i])  # Replicates bug in K14 master code
 		
-		# Randomly sample indices
-		temp_idx = rng.choice(np.arange(len(temp)), nsamps)
-		temp = temp[temp_idx]
+		# Randomly sample indices (used when seed is not specified and ends up being the same as for DSL)
+		#temp_idx = rng.choice(np.arange(len(temp)), nsamps)
+		#temp = temp[temp_idx]
 		
 		thermsamps[:,i] = (ThermExpScale * temp * ThermExpStd[this_year_ind]) + ThermExpMean[this_year_ind]
 
