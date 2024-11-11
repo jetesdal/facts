@@ -63,6 +63,7 @@ fit:
           - "%PIPELINE_ID%_config.pkl"
           - "%PIPELINE_ID%_ZOSTOGA.pkl"
           - "%PIPELINE_ID%_ZOS.pkl"
+          - "%PIPELINE_ID%_TAS.pkl"
 
 project:
   task1:
