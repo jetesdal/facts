@@ -186,6 +186,7 @@ def tlm_postprocess_oceandynamics(nsamps, rng_seed, chunksize, keep_temp, pipeli
 	# Open the temporary data sets
 	#combined = xr.open_mfdataset("{0}_tempsamps_*.nc".format(pipeline_id), concat_dim="locations", chunks={"locations":chunksize})
 	combined = xr.open_mfdataset("{0}_tempsamps_*.nc".format(pipeline_id), chunks={"locations":chunksize})
+	combined.attrs['seed'] = str(rng_seed)
 
 	# Write the combined data out to the final netcdf file
 	combined.to_netcdf("{0}_localsl.nc".format(pipeline_id), encoding={"sea_level_change": {"dtype": "f4", "zlib": True, "complevel":4, "_FillValue": nc_missing_value}})
@@ -225,7 +226,6 @@ def tlm_postprocess_oceandynamics(nsamps, rng_seed, chunksize, keep_temp, pipeli
 	rootgrp.description = "Ocean Dynamics intermediate data for the TLM workflow"
 	rootgrp.history = "Created " + time.ctime(time.time())
 	rootgrp.source = "FACTS: {0} - {1}. ".format(pipeline_id, scenario) + model_string
-	rootgrp.seed = str(rng_seed)
 	lat_var.units = "Degrees North"
 	lon_var.units = "Degrees East"
 
