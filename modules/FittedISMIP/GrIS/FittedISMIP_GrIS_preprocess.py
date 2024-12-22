@@ -46,7 +46,7 @@ def FittedISMIP_preprocess_icesheet(scenario, tlm_flag, pipeline_id, climate_fna
 
     ###################################################
     # Store the data in a pickle
-	output = {'years': years, 'temp_data': temp_data, 'scenario': scenario}
+	output = {'years': years, 'temp_data': temp_data, 'scenario': scenario, 'tlm_flag': tlm_flag}
 
 	# Write the data to a file
 	outdir = os.path.dirname(__file__)
