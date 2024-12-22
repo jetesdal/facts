@@ -36,6 +36,7 @@ def FittedISMIP_project_icesheet(nsamps, pyear_start, pyear_end, pyear_step, cye
 	years = my_data["years"]
 	temp_data = my_data["temp_data"]
 	scenario = my_data["scenario"]
+	tlm_flag = my_data["tlm_flag"]
 
 	# Load the fit file
 	datafilename = "{}_fit.pkl".format(pipeline_id)
@@ -78,6 +79,15 @@ def FittedISMIP_project_icesheet(nsamps, pyear_start, pyear_end, pyear_step, cye
 
 	# Generate a list of quantiles for the trend samples
 	trend_q = rng.random(nsamps)
+	
+	# Resample temp_data to match nsamps (only if tlm_flag is 0 and size of temp_data is less than nsamps)
+	if tlm_flag == 0:
+		if temp_data.shape[0] < nsamps:
+			temp_data_resampled = np.empty((nsamps, temp_data.shape[1]))
+			for year_idx in range(temp_data.shape[1]):
+				temp_data_resampled[:, year_idx] = rng.choice(temp_data[:, year_idx], size=nsamps, replace=True)
+				
+			temp_data = temp_data_resampled
 
 	# Loop over the ice sources
 	#for icesource in icesources:
