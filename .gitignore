@@ -51,3 +51,27 @@ makefile
 
 Q-err.txt
 *.nc
+
+# Logs and temporary files
+*.err
+*.out
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Experiment outputs and archives
+archive/
+experiments/*/output/
+experiments/*/workflows.yml
+test.*
+myexperiments/
+
+# Shell scripts
+run_experiments*.sh
+
+# Slurm files (job scheduler logs)
+slurm.*
+
+# Temporary or backup files
+*.tmp
+*.bak
