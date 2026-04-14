@@ -48,6 +48,7 @@ def tlm_fit_oceandynamics(pipeline_id):
 	f.close()
 
 	sTAS = my_tas["sTAS"]
+	sTAS_full = np.copy(sTAS)
 	tas_modellist = my_tas['tas_modellist']
 
 	# Load the ZOSTOGA file
@@ -62,6 +63,7 @@ def tlm_fit_oceandynamics(pipeline_id):
 	f.close()
 
 	sZOSTOGA = my_zostoga["sZOSTOGA"]
+	sZOSTOGA_full = np.copy(sZOSTOGA)
 	zostoga_modellist = my_zostoga['zostoga_modellist']
 
 	# Load the ZOS file
@@ -78,6 +80,9 @@ def tlm_fit_oceandynamics(pipeline_id):
 	sZOS = my_zos["sZOS"]
 	sZOSTOGAadj = my_zos["sZOSTOGAadj"]
 	sTASadj = my_zos["sTASadj"]
+	sZOS_full = np.copy(sZOS)
+	sZOSTOGAadj_full = np.copy(sZOSTOGAadj)
+	sTASadj_full = np.copy(sTASadj)
 	focus_site_lats = my_zos["focus_site_lats"]
 	focus_site_ids = my_zos["focus_site_ids"]
 	comb_modellist = my_zos["comb_modellist"]
@@ -186,6 +191,7 @@ def tlm_fit_oceandynamics(pipeline_id):
 		model_idx = extremeness < 10   # Wrapped in np.errstate call to surpress warning of 'nan' in less-than test
 	nan_mask = np.where(np.logical_or(model_idx, extremeness_model_check), 1.0, np.nan)
 	sZOS = sZOS * nan_mask
+	sZOS_full = sZOS_full * nan_mask
 
 	# For points that have enough pre-extremeness check models, calculate and
 	# remove "extremeness" as models that in year 2099 have values (less the
@@ -198,6 +204,7 @@ def tlm_fit_oceandynamics(pipeline_id):
 		model_idx = extremeness < 3   # Wrapped in np.errstate call to surpress warning of 'nan' in greater-than test
 	nan_mask = np.where(np.logical_or(model_idx, np.logical_or(extremeness_model_check,std_limit)), 1.0, np.nan)
 	sZOS = sZOS * nan_mask
+	sZOS_full = sZOS_full * nan_mask
 
 	# Calculate the OD mean, std, and N
 	OceanDynMean = np.nanmean(sZOS, axis=1) * 1000.0
@@ -277,10 +284,10 @@ def tlm_fit_oceandynamics(pipeline_id):
 	outfile.close()
 	
 	# Write processed ZOS and ZOSTOGA variables to a file
-	output = {'sZOS': sZOS, 'zos_modellist': zos_modellist, 'zos_scenariolist': my_zos['zos_scenariolist'], 'zosyears': OceanDynYears, \
+	output = {'sZOS': sZOS_full, 'zos_modellist': zos_modellist, 'zos_scenariolist': my_zos['zos_scenariolist'], 'zosyears': datayears, \
 		  'focus_site_ids': focus_site_ids, 'focus_site_lats': focus_site_lats, 'focus_site_lons': my_zos["focus_site_lons"], \
-		  'sZOSTOGAadj': sZOSTOGAadj, 'sTASadj': sTASadj, 'comb_modellist': comb_modellist, 'sZOSTOGA': sZOSTOGA, 'zostoga_modellist': zostoga_modellist, \
-		  'zostoga_scenariolist': my_zostoga['zostoga_scenariolist'], 'zostogayears': datayears, 'sTAS': sTAS, 'tas_modellist': tas_modellist, \
+		  'sZOSTOGAadj': sZOSTOGAadj_full, 'sTASadj': sTASadj_full, 'comb_modellist': comb_modellist, 'sZOSTOGA': sZOSTOGA_full, 'zostoga_modellist': zostoga_modellist, \
+		  'zostoga_scenariolist': my_zostoga['zostoga_scenariolist'], 'zostogayears': datayears, 'sTAS': sTAS_full, 'tas_modellist': tas_modellist, \
 		  'tas_scenariolist': my_tas['tas_scenariolist'], 'tasyears': datayears}
 	outfile = open(os.path.join(os.path.dirname(__file__), "{}_zos_fit_combined.pkl".format(pipeline_id)), 'wb')
 	pickle.dump(output, outfile, protocol=4)
